@@ -81,7 +81,6 @@ public class CartServiceImpl implements CartService {
 
             // Bước 2: Xử lý danh sách sản phẩm trong yêu cầu
             List<Cart_Product> existingCartProducts = cart.getCart_products();
-            double totalPrice = 0.0;
             for (CartProductRequest cartProductRequest : cartRequest.getCartProduct()) {
                 Product product = productRepository.findById(cartProductRequest.getProductId())
                         .orElseThrow(() -> new RuntimeException("Not found product"));
@@ -104,13 +103,13 @@ public class CartServiceImpl implements CartService {
                     newCartProduct.setQuantity(cartProductRequest.getQuantity());
                     existingCartProducts.add(newCartProduct);
                 }
-
-                // Cập nhật totalPrice
-                totalPrice += product.getPrice() + cartProductRequest.getQuantity();
-                System.out.println(totalPrice);
             }
 
-            // Cập nhật tổng giá của giỏ hàng
+            // Tính tổng giá và cập nhật lại
+            double totalPrice = cart.getCart_products().stream()
+                    .mapToDouble(cart_Product -> cart_Product.getProduct().getPrice() * cart_Product.getQuantity())
+                    .sum();
+
             cart.setTotal_price(totalPrice);
 
             // Lưu giỏ hàng đã được cập nhật
@@ -122,11 +121,14 @@ public class CartServiceImpl implements CartService {
             cartResponse.setId(savedCart.getId());
             cartResponse.setCartProduct(savedCart.getCart_products().stream().map(cartProduct -> {
                 CartProductResponse cartProductResponse = new CartProductResponse();
+                cartProductResponse.setId(cartProduct.getProduct().getId());
                 cartProductResponse.setProductName(cartProduct.getProduct().getName());
                 cartProductResponse.setQuantity(cartProduct.getQuantity());
                 cartProductResponse.setPrice(cartProduct.getProduct().getPrice());
                 return cartProductResponse;
             }).collect(Collectors.toList()));
+
+            cartResponse.setTotal_price(savedCart.getTotal_price());
 
             return cartResponse;
 
@@ -174,7 +176,7 @@ public class CartServiceImpl implements CartService {
         cartProductRepository.deleteAll(productsToRemove);
 
         // Tính lại total sau khi xóa sản phẩm khỏi giỏ hàng
-        for(Cart_Product cartProduct : cart.getCart_products()){
+        for (Cart_Product cartProduct : cart.getCart_products()) {
             totalPrice += cartProduct.getProduct().getPrice() * cartProduct.getQuantity();
         }
 
@@ -190,6 +192,7 @@ public class CartServiceImpl implements CartService {
         List<CartProductResponse> cartProductResponses = updatedCart.getCart_products().stream()
                 .map(cp -> {
                     CartProductResponse productResponse = new CartProductResponse();
+                    productResponse.setId(cp.getProduct().getId()); // Đảm bảo rằng ID sản phẩm được đặt
                     productResponse.setProductName(cp.getProduct().getName());
                     productResponse.setQuantity(cp.getQuantity());
                     productResponse.setPrice(cp.getProduct().getPrice());
@@ -197,6 +200,9 @@ public class CartServiceImpl implements CartService {
                 }).collect(Collectors.toList());
 
         response.setCartProduct(cartProductResponses);
+
+        // Đặt giá trị total_price vào CartResponse
+        response.setTotal_price(updatedCart.getTotal_price());
 
         return response;
     }
@@ -206,8 +212,6 @@ public class CartServiceImpl implements CartService {
         // Lấy giỏ hàng dựa trên id
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy giỏ hàng"));
-        // Trả về giỏ hàng dưới dạng CartResponse
-        // return modelMapper.map(cart, CartResponse.class);
 
         // Tạo đối tượng CartResponse
         CartResponse cartResponse = new CartResponse();
@@ -216,6 +220,7 @@ public class CartServiceImpl implements CartService {
         // Ánh xạ danh sách Cart_Product sang CartProductResponse
         List<CartProductResponse> cartProductResponses = cart.getCart_products().stream().map(cartProduct -> {
             CartProductResponse cartProductResponse = new CartProductResponse();
+            cartProductResponse.setId(cartProduct.getProduct().getId()); // Đảm bảo rằng ID sản phẩm được đặt
             cartProductResponse.setProductName(cartProduct.getProduct().getName());
             cartProductResponse.setQuantity(cartProduct.getQuantity());
             cartProductResponse.setPrice(cartProduct.getProduct().getPrice());
@@ -223,6 +228,9 @@ public class CartServiceImpl implements CartService {
         }).collect(Collectors.toList());
 
         cartResponse.setCartProduct(cartProductResponses);
+
+        // Đặt giá trị total_price vào CartResponse
+        cartResponse.setTotal_price(cart.getTotal_price());
 
         return cartResponse;
     }
