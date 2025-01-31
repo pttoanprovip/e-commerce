@@ -37,4 +37,7 @@ public class User_Address {
 
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "defaultAddress")
+    private boolean defaultAddress;
 }

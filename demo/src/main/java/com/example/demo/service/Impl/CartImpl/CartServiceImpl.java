@@ -192,7 +192,7 @@ public class CartServiceImpl implements CartService {
         List<CartProductResponse> cartProductResponses = updatedCart.getCart_products().stream()
                 .map(cp -> {
                     CartProductResponse productResponse = new CartProductResponse();
-                    productResponse.setId(cp.getProduct().getId());
+                    productResponse.setId(cp.getProduct().getId()); // Đảm bảo rằng ID sản phẩm được đặt
                     productResponse.setProductName(cp.getProduct().getName());
                     productResponse.setQuantity(cp.getQuantity());
                     productResponse.setPrice(cp.getProduct().getPrice());
