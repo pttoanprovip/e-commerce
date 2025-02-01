@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,27 +24,34 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private final ModelMapper modelMapper;
-    private final PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper,
+            RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
+
+        // Cấu hình lại ModelMapper
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+        modelMapper.createTypeMap(UserRequest.class, User.class)
+            .addMappings(mapper -> {
+                mapper.skip(User::setId);
+            });
     }
 
     @Override
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
         // Kiểm tra số điện thoại
-        if (userRepository.existByPhone(userRequest.getPhone())) {
+        if (userRepository.existsByPhone(userRequest.getPhone())) {
             throw new RuntimeException("Phone already exist");
         }
 
         // Kiểm tra địa chỉ email
-        if (userRepository.existByEmail(userRequest.getEmail())) {
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new RuntimeException("Email already exist");
         }
 
@@ -53,6 +61,7 @@ public class UserServiceImpl implements UserService {
 
         // Chuyển đổi dữ liệu từ dto sang entity
         User user = modelMapper.map(userRequest, User.class);
+        System.out.println("User Id aftermapping" + user.getId());
         user.setRole(role);
         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
 
@@ -79,26 +88,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse update(int id, UserRequest userRequest) {
         // Kiểm tra người dùng
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
         // Kiểm tra và cập nhật số điện thoại mới nếu có thay đổi
         if (userRequest.getPhone() != null && !userRequest.getPhone().isEmpty()
-                && !userRequest.getPhone().equals(userRequest.getPhone())) {
-            if (userRepository.existByPhone(userRequest.getPhone())) {
-                throw new RuntimeException("Phone already exist");
+                && !userRequest.getPhone().equals(user.getPhone())) {
+            if (userRepository.existsByPhone(userRequest.getPhone())) {
+                throw new RuntimeException("Phone already exists");
             }
             user.setPhone(userRequest.getPhone());
         }
 
         // Kiểm tra và cập nhật email mới nếu có thay đổi
         if (userRequest.getEmail() != null && !userRequest.getEmail().isEmpty()
-                && !userRequest.getEmail().equals(userRequest.getEmail())) {
-            if (userRepository.existByEmail(userRequest.getEmail())) {
-                throw new RuntimeException("Email already exist");
+                && !userRequest.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(userRequest.getEmail())) {
+                throw new RuntimeException("Email already exits");
             }
-            user.setEmail(userRequest.getName());
+            user.setEmail(userRequest.getEmail());
         }
 
         // cập nhật tên
@@ -127,6 +137,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void delete(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));

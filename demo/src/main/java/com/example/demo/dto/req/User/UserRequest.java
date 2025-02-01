@@ -8,5 +8,5 @@ public class UserRequest {
     private String password;
     private String email;
     private String phone;
-    private int RoleId;
+    private int roleId;
 }

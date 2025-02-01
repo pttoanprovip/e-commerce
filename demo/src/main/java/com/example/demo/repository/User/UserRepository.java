@@ -7,6 +7,6 @@ import com.example.demo.entity.User.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer>{
-    boolean existByPhone(String phone);
-    boolean existByEmail(String email);
+    boolean existsByPhone(String phone);
+    boolean existsByEmail(String email);
 }
