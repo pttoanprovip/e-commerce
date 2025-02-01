@@ -25,31 +25,37 @@ public class Product_ImageController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductImageResponse> add(@RequestBody ProductImageRequest productImageRequest) {
+    public ResponseEntity<?> add(@RequestBody ProductImageRequest productImageRequest) {
         try {
             ProductImageResponse productImage = productImageService.add(productImageRequest);
             return ResponseEntity.ok(productImage);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error");
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductImageResponse> update(@RequestBody ProductImageRequest productImageRequest,
+    public ResponseEntity<?> update(@RequestBody ProductImageRequest productImageRequest,
             @PathVariable int id) {
         try {
             ProductImageResponse productImage = productImageService.update(productImageRequest, id);
             return ResponseEntity.ok(productImage);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error");
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    public ResponseEntity<?> delete(@PathVariable int id) {
         try {
             productImageService.delete(id);
             return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(404).build();
         }

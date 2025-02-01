@@ -29,61 +29,73 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAll() {
+    public ResponseEntity<?> getAll() {
         try {
             List<CategoryResponse> category = categoryService.findAll();
             return ResponseEntity.ok(category);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(505).build();
         }
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<CategoryResponse> getById(@PathVariable int id) {
+    public ResponseEntity<?> getById(@PathVariable int id) {
         try {
             CategoryResponse category = categoryService.findById(id);
             return ResponseEntity.ok(category);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(404).build();
         }
     }
 
     @GetMapping("/search")
-    public ResponseEntity<CategoryResponse> getByName(@RequestParam String name){
+    public ResponseEntity<?> getByName(@RequestParam String name) {
         try {
             CategoryResponse category = categoryService.findByName(name);
             return ResponseEntity.ok(category);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> add(@RequestBody CategoryRequest categoryRequest){
+    public ResponseEntity<?> add(@RequestBody CategoryRequest categoryRequest) {
         try {
             CategoryResponse category = categoryService.add(categoryRequest);
             return ResponseEntity.ok(category);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> update(@RequestBody CategoryRequest categoryRequest,
-                                                   @PathVariable int id){
+    public ResponseEntity<?> update(@RequestBody CategoryRequest categoryRequest,
+            @PathVariable int id) {
         try {
             CategoryResponse category = categoryService.update(categoryRequest, id);
             return ResponseEntity.ok(category);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
-        }     
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id){
+    public ResponseEntity<?> delete(@PathVariable int id) {
         try {
             categoryService.delete(id);
             return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(404).build();
         }

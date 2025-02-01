@@ -13,26 +13,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.req.User.UserRequest;
-import com.example.demo.dto.res.User.UserResponse;
-import com.example.demo.service.User.UserService;
+import com.example.demo.dto.req.User.UserAddressRequest;
+import com.example.demo.dto.res.User.UserAddressResponse;
+import com.example.demo.service.User.UserAddressService;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/users/addresses")
+public class UserAddressController {
 
-    private UserService userService;
+    private UserAddressService userAddressService;
 
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserAddressController(UserAddressService userAddressService) {
+        this.userAddressService = userAddressService;
     }
 
     @PostMapping
-    public ResponseEntity<?> add(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<?> create(@RequestBody UserAddressRequest userAddressRequest) {
         try {
-            UserResponse user = userService.createUser(userRequest);
-            return ResponseEntity.ok(user);
+            UserAddressResponse address = userAddressService.create(userAddressRequest);
+            return ResponseEntity.ok(address);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -40,11 +40,11 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable int id) {
         try {
-            UserResponse user = userService.findById(id);
-            return ResponseEntity.ok(user);
+            userAddressService.delete(id);
+            return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -52,11 +52,11 @@ public class UserController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAll() {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getUserAddressByUserId(@PathVariable int userId) {
         try {
-            List<UserResponse> user = userService.getAll();
-            return ResponseEntity.ok(user);
+            List<UserAddressResponse> address = userAddressService.getUserAddressByUserId(userId);
+            return ResponseEntity.ok(address);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -66,11 +66,11 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
-            @PathVariable int id, 
-            @RequestBody UserRequest userRequest) {
+            @PathVariable int id,
+            @RequestBody UserAddressRequest userAddressRequest) {
         try {
-            UserResponse user = userService.update(id, userRequest);
-            return ResponseEntity.ok(user);
+            UserAddressResponse address = userAddressService.update(id, userAddressRequest);
+            return ResponseEntity.ok(address);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -78,11 +78,11 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable int id){
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserAddressById(@PathVariable int id){
         try {
-            userService.delete(id);
-            return ResponseEntity.noContent().build();
+            UserAddressResponse address = userAddressService.getUserAddressById(id);
+            return ResponseEntity.ok(address);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {

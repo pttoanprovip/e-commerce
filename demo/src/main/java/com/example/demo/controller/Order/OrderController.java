@@ -30,40 +30,48 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<?> placeOrder(@RequestBody OrderRequest orderRequest) {
         try {
             OrderResponse order = orderService.placeOrder(orderRequest);
             return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getById(@PathVariable int id) {
+    public ResponseEntity<?> getById(@PathVariable int id) {
         try {
             OrderResponse order = orderService.getOrderById(id);
             return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderResponse>> getByUserId(@PathVariable int userId) {
+    public ResponseEntity<?> getByUserId(@PathVariable int userId) {
         try {
             List<OrderResponse> order = orderService.getUserById(userId);
             return ResponseEntity.ok(order);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @PutMapping("{userId}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable int userId, @RequestParam OrderStatus orderStatus) {
+    public ResponseEntity<?> updateStatus(@PathVariable int userId, @RequestParam OrderStatus orderStatus) {
         try {
             orderService.updateOrderStatus(userId, orderStatus);
             return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(400).build();
         }

@@ -24,31 +24,37 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<CartResponse> addItem(@RequestBody CartRequest cartRequest) {
+    public ResponseEntity<?> addItem(@RequestBody CartRequest cartRequest) {
         try {
             CartResponse cart = cartService.addItem(cartRequest);
             return ResponseEntity.ok(cart);
-        } catch (Exception e) {
+        }catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }  catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<CartResponse> removeItem(@RequestBody CartRequest cartRequest){
+    public ResponseEntity<?> removeItem(@RequestBody CartRequest cartRequest){
         try {
             CartResponse cart = cartService.removeItem(cartRequest);
             return ResponseEntity.ok(cart);
-        } catch (Exception e) {
+        }catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }  catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CartResponse> getCart(@PathVariable int id){
+    public ResponseEntity<?> getCart(@PathVariable int id){
         try {
             CartResponse cart = cartService.getCart(id);
             return ResponseEntity.ok(cart);
-        } catch (Exception e) {
+        }catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }  catch (Exception e) {
             return ResponseEntity.status(500).build();
         }   
     }
