@@ -29,6 +29,12 @@ public class UserAddressServiceImpl implements UserAddressService {
         this.userAddressRepository = userAddressRepository;
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
+
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+        modelMapper.createTypeMap(UserAddressRequest.class, User_Address.class)
+            .addMappings(mapper -> {
+                mapper.skip(User_Address::setId);
+            });
     }
 
     @Override
@@ -37,6 +43,11 @@ public class UserAddressServiceImpl implements UserAddressService {
         // Tìm người dùng từ userId trong yêu cầu
         User user = userRepository.findById(userAddressRequest.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+            
+        // Nếu địa chỉ mới là mặc định, xóa các địa chỉ mặc định cũ
+        if(userAddressRequest.isDefaultAddress()){
+            userAddressRepository.clearDefaultAddress(user.getId());
+        }
 
         // Chuyển đổi từ DTO sang Entity
         User_Address address = modelMapper.map(userAddressRequest, User_Address.class);

@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class UserAddressRequest {
-    private int UserId;
+    private int userId;
     private String address;
     private String city;
     private String country;
