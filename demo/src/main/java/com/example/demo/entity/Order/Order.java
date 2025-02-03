@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.demo.entity.User.User;
+import com.example.demo.entity.discount.Discount;
 import com.example.demo.enums.OrderStatus;
 
 import jakarta.persistence.Column;
@@ -34,6 +35,10 @@ public class Order {
     @ManyToOne
     @JoinColumn(name ="id_user")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "id_discount")
+    private Discount discount;
 
     @Column(name = "total_price")
     private double total_price;

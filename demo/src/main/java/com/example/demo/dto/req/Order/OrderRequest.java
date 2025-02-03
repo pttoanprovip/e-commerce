@@ -6,5 +6,6 @@ import lombok.Data;
 @Data
 public class OrderRequest {
     private int userId;
+    private String discountCode;
     private List<OrderItemRequest> order_items;
 }

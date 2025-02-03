@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.dto.req.Discount.ApplyDiscountRequest;
 import com.example.demo.dto.req.Order.OrderRequest;
 import com.example.demo.dto.res.Order.OrderItemResponse;
 import com.example.demo.dto.res.Order.OrderResponse;
@@ -23,6 +24,7 @@ import com.example.demo.repository.Order.OrderItemRepository;
 import com.example.demo.repository.Order.OrderRepository;
 import com.example.demo.repository.Product.ProductRepository;
 import com.example.demo.repository.User.UserRepository;
+import com.example.demo.service.Dicount.DiscountService;
 import com.example.demo.service.Order.OrderService;
 
 @Service
@@ -33,18 +35,20 @@ public class OrderServiceImpl implements OrderService {
     private ProductRepository productRepository;
     private UserRepository userRepository;
     private CartRepository cartRepository;
+    private DiscountService discountService;
     private final ModelMapper modelMapper;
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository,
             ProductRepository productRepository, UserRepository userRepository, CartRepository cartRepository,
-            ModelMapper modelMapper) {
+            ModelMapper modelMapper, DiscountService discountService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.modelMapper = modelMapper;
+        this.discountService = discountService;
     }
 
     @Override
@@ -108,7 +112,13 @@ public class OrderServiceImpl implements OrderService {
         // Tính tổng giá và cập nhật lại
         double totalPrice = orderItems.stream()
                 .mapToDouble(orderItem -> orderItem.getProduct().getPrice() * orderItem.getQuantity()).sum();
-        
+
+        // Áp dụng mã giảm giá nếu có
+        if (orderRequest.getDiscountCode() != null) {
+            ApplyDiscountRequest applyDiscountRequest = new ApplyDiscountRequest();
+            applyDiscountRequest.setCode(orderRequest.getDiscountCode());
+            totalPrice = discountService.applyDiscount(applyDiscountRequest, totalPrice);
+        }
 
         savaOrder.setTotal_price(totalPrice);
         orderRepository.save(savaOrder);
