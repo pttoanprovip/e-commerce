@@ -13,7 +13,7 @@ import com.example.demo.repository.Cart.CartRepository;
 import com.example.demo.repository.Product.ProductRepository;
 import com.example.demo.repository.User.UserRepository;
 import com.example.demo.service.Cart.CartService;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class CartServiceImpl implements CartService {
     // private final ModelMapper modelMapper;
     private final CartProductRepository cartProductRepository;
 
-    @Autowired
+    //@Autowired
     public CartServiceImpl(CartRepository cartRepository,
             ProductRepository productRepository, UserRepository userRepository, // ModelMapper modelMapper,
             CartProductRepository cartProductRepository) {

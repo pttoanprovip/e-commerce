@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +23,7 @@ public class DiscountServiceImpl implements DiscountService {
     private DiscountRepository discountRepository;
     private final ModelMapper modelMapper;
 
-    @Autowired
+    // @Autowired
     public DiscountServiceImpl(DiscountRepository discountRepository, ModelMapper modelMapper) {
         this.discountRepository = discountRepository;
         this.modelMapper = modelMapper;
@@ -97,6 +97,10 @@ public class DiscountServiceImpl implements DiscountService {
 
         LocalDateTime now = LocalDateTime.now();
 
+        System.out.println("Current time: " + now); // Thêm dòng này để log thời gian hiện tại
+        System.out.println("Discount start: " + discount.getStartDate());
+        System.out.println("Discount end: " + discount.getEndDate());
+
         // Kiểm tra tính hợp lệ của thời gian giảm giá
         if (now.isBefore(discount.getStartDate()) || now.isAfter(discount.getEndDate())) {
             throw new RuntimeException("Discount is not valid at this time");
@@ -111,11 +115,11 @@ public class DiscountServiceImpl implements DiscountService {
         double discountAmount = totalPrice * (discount.getDiscountPercentage() / 100);
 
         // Nếu có giới hạn giảm giá, tính toán lại
-        if(discount.getMaxDiscountAmount() > 0 && discountAmount > discount.getMaxDiscountAmount()){
+        if (discount.getMaxDiscountAmount() > 0 && discountAmount > discount.getMaxDiscountAmount()) {
             discountAmount = discount.getMaxDiscountAmount();
         }
 
-         // Đánh dấu mã giảm giá là đã sử dụng
+        // Đánh dấu mã giảm giá là đã sử dụng
         discount.setUsed(true);
 
         // Lưu lại

@@ -1,7 +1,7 @@
 package com.example.demo.service.Impl.ProductImpl;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     private final ModelMapper modelMapper;
     private final ProductRepository productRepository;
 
-    @Autowired
+    //@Autowired
     public ProductImageServiceImpl(ProductImageRepository productImageRepository, ProductRepository productRepository,
             ModelMapper modelMapper) {
         this.productImageRepository = productImageRepository;

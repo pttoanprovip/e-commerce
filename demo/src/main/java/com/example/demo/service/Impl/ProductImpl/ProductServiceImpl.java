@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     private final ModelMapper modelMapper;
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    @Autowired
+    //@Autowired
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository,
             ModelMapper modelMapper) {
         this.productRepository = productRepository;

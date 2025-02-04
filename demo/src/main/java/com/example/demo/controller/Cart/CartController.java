@@ -1,6 +1,6 @@
 package com.example.demo.controller.Cart;
 
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +18,7 @@ import com.example.demo.service.Cart.CartService;
 public class CartController {
     private final CartService cartService;
 
-    @Autowired
+    //@Autowired
     public CartController(CartService cartService) {
         this.cartService = cartService;
     }

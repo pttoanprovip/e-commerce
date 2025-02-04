@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +23,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     private UserAddressRepository userAddressRepository;
     private final ModelMapper modelMapper;
 
-    @Autowired
+    //@Autowired
     public UserAddressServiceImpl(UserAddressRepository userAddressRepository, UserRepository userRepository,
             ModelMapper modelMapper) {
         this.userAddressRepository = userAddressRepository;

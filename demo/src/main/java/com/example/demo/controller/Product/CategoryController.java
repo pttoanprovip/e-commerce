@@ -2,7 +2,7 @@ package com.example.demo.controller.Product;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ import com.example.demo.service.Product.CategoryService;
 public class CategoryController {
     private CategoryService categoryService;
 
-    @Autowired
+    //@Autowired
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }

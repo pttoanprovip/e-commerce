@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private DiscountService discountService;
     private final ModelMapper modelMapper;
 
-    @Autowired
+    //@Autowired
     public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository,
             ProductRepository productRepository, UserRepository userRepository, CartRepository cartRepository,
             ModelMapper modelMapper, DiscountService discountService) {

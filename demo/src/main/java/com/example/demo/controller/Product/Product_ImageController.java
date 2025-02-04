@@ -1,6 +1,6 @@
 package com.example.demo.controller.Product;
 
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +19,7 @@ import com.example.demo.service.Product.ProductImageService;
 public class Product_ImageController {
     private ProductImageService productImageService;
 
-    @Autowired
+    //@Autowired
     public Product_ImageController(ProductImageService productImageService) {
         this.productImageService = productImageService;
     }

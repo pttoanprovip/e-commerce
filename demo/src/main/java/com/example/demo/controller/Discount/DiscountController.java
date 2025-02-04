@@ -2,7 +2,7 @@ package com.example.demo.controller.Discount;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.req.Discount.ApplyDiscountRequest;
 import com.example.demo.dto.req.Discount.DiscountRequest;
 import com.example.demo.dto.res.Discount.DiscountResponse;
-import com.example.demo.dto.res.User.UserResponse;
 import com.example.demo.service.Dicount.DiscountService;
 
 @RestController
@@ -26,7 +25,7 @@ public class DiscountController {
 
     private DiscountService discountService;
 
-    @Autowired
+    //@Autowired
     public DiscountController(DiscountService discountService) {
         this.discountService = discountService;
     }

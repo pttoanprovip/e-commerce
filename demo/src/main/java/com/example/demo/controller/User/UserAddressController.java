@@ -2,7 +2,7 @@ package com.example.demo.controller.User;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ public class UserAddressController {
 
     private UserAddressService userAddressService;
 
-    @Autowired
+    //@Autowired
     public UserAddressController(UserAddressService userAddressService) {
         this.userAddressService = userAddressService;
     }
