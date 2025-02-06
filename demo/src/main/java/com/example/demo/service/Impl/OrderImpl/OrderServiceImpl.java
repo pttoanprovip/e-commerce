@@ -64,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(OrderStatus.Pending);
 
         // Lưu đơn hàng
-        Order savaOrder = orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
 
         // Lấy danh sách sản phẩm
         List<OrderItem> orderItems;
@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
                         .orElseThrow(() -> new RuntimeException("Product not found"));
 
                 OrderItem orderItem = new OrderItem();
-                orderItem.setOrder(savaOrder);
+                orderItem.setOrder(savedOrder);
                 orderItem.setProduct(product);
                 orderItem.setQuantity(productRequest.getQuantity());
 
@@ -97,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
                         .orElseThrow(() -> new RuntimeException("Product not found"));
 
                 OrderItem orderItem = new OrderItem();
-                orderItem.setOrder(savaOrder);
+                orderItem.setOrder(savedOrder);
                 orderItem.setProduct(product);
                 orderItem.setQuantity(CartProduct.getQuantity());
                 return orderItem;
@@ -120,11 +120,11 @@ public class OrderServiceImpl implements OrderService {
             totalPrice = discountService.applyDiscount(applyDiscountRequest, totalPrice);
         }
 
-        savaOrder.setTotal_price(totalPrice);
-        orderRepository.save(savaOrder);
+        savedOrder.setTotal_price(totalPrice);
+        orderRepository.save(savedOrder);
 
         // Chuyển đổi sang response
-        OrderResponse orderResponse = modelMapper.map(savaOrder, OrderResponse.class);
+        OrderResponse orderResponse = modelMapper.map(savedOrder, OrderResponse.class);
         // List<OrderItemResponse> orderItemResponses = orderItems.stream()
         // .map(orderItem -> modelMapper.map(orderItem, OrderItemResponse.class))
         // .collect(Collectors.toList());
@@ -139,7 +139,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderResponse.setOrderItem(orderItemResponses);
 
-        orderResponse.setUserFullName(savaOrder.getUser().getName());
+        orderResponse.setUserFullName(savedOrder.getUser().getName());
 
         return orderResponse;
     }
