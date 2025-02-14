@@ -31,6 +31,7 @@ public class PayPalPaymentServiceImpl implements PaymentService {
     private final APIContext apiContext;
     private OrderRepository orderRepository;
 
+    // Constructor để khởi tạo các dependency
     public PayPalPaymentServiceImpl(PaymentRepository paymentRepository, ModelMapper modelMapper,
             APIContext apiContext, OrderRepository orderRepository) {
         this.paymentRepository = paymentRepository;
@@ -46,7 +47,7 @@ public class PayPalPaymentServiceImpl implements PaymentService {
         Order order = orderRepository.findById(paymentRequest.getOrderId())
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // Tạo đối tượng Payment
+        // Tạo đối tượng Payment từ thông tin trong paymentRequest
         Payment payment = new Payment();
         payment.setOrder(order);
         payment.setPaymentMethod(paymentRequest.getPaymentMethod());
@@ -57,86 +58,90 @@ public class PayPalPaymentServiceImpl implements PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
 
         try {
-            // Tạo cấu hình thông tin thanh toán
+            // Tạo đối tượng Amount từ tổng giá trị của đơn hàng
             Amount amount = new Amount();
-            amount.setCurrency("USD");
-            // Sử dụng tổng giá trị từ Order
-            amount.setTotal(String.format("%.2f", order.getTotal_price()));
+            amount.setCurrency("USD"); // Đơn vị tiền tệ là USD
+            amount.setTotal(String.format("%.2f", order.getTotal_price())); // Định dạng giá trị tiền
 
+            // Tạo đối tượng Transaction để mô tả giao dịch
             Transaction transaction = new Transaction();
             transaction.setAmount(amount);
             transaction.setDescription("Payment for Order #" + order.getId());
 
-            // Tiến hành tạo thanh toán qua PayPal
-            // PayPalPayment payPalPayment = new PayPalPayment();
+            // Tạo đối tượng Payment của PayPal
             com.paypal.api.payments.Payment payPalPayment = new com.paypal.api.payments.Payment();
-            payPalPayment.setIntent("sale");
+            payPalPayment.setIntent("sale"); // Xác định loại thanh toán là "sale" (bán)
 
-            // Tạo đối tượng payer và thiết lập thông tin
+            // Tạo đối tượng Payer và thiết lập phương thức thanh toán
             Payer payer = new Payer();
             payer.setPaymentMethod(paymentRequest.getPaymentMethod());
             payPalPayment.setPayer(payer);
 
-            // Tạo redirect URLs
+            // Tạo redirect URLs (URL quay lại và hủy bỏ thanh toán)
             RedirectUrls redirectUrls = new RedirectUrls();
             redirectUrls.setReturnUrl("http://localhost:8080/payments/execute");
             redirectUrls.setCancelUrl("http://localhost:8080/payments/cancel");
             payPalPayment.setRedirectUrls(redirectUrls);
 
-            // Thêm transaction vào payment
+            // Thêm giao dịch vào đối tượng Payment của PayPal
             payPalPayment.setTransactions(Collections.singletonList(transaction));
 
-            // Thực hiện thanh toán
+            // Thực hiện thanh toán qua PayPal
             com.paypal.api.payments.Payment createPayment = payPalPayment.create(apiContext);
 
-            // Lấy link thanh toán từ PayPal
+            // Lấy link thanh toán (approval URL) từ PayPal
             String approvalUrl = createPayment.getLinks().stream()
-                    .filter(link -> "approval_url".equals(link.getRel()))
+                    .filter(link -> "approval_url".equals(link.getRel())) // Lọc để lấy approval URL
                     .findFirst()
                     .map(link -> link.getHref())
                     .orElseThrow(() -> new RuntimeException("Approval URL not found"));
 
-            // Lưu transactionId tạm thời
+            // Lưu transactionId tạm thời vào Payment trong cơ sở dữ liệu
             savedPayment.setTransactionId(createPayment.getId());
             paymentRepository.save(savedPayment);
 
-            return approvalUrl;
+            return approvalUrl; // Trả về URL chấp nhận thanh toán
         } catch (PayPalRESTException e) {
+            // Nếu có lỗi khi tạo thanh toán, cập nhật trạng thái thanh toán là FAILED
             savedPayment.setPaymentStatus(PaymentStatus.FAILED);
             paymentRepository.save(savedPayment);
             throw new RuntimeException("PayPal payment creation failed", e);
         }
-
     }
 
     @Override
     @Transactional
     public PaymentResponse execute(String paymentId, String payerId) {
+        // Lấy Payment từ cơ sở dữ liệu bằng transactionId (paymentId)
         Payment payment = paymentRepository.findByTransactionId(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        // Kiểm tra xem thanh toán đã được thực hiện thành công chưa
+        // Kiểm tra nếu thanh toán đã thành công thì không xử lý lại
         if (payment.getPaymentStatus() == PaymentStatus.SUCCESS) {
             throw new RuntimeException("Payment has already been completed.");
         }
 
         try {
+            // Thiết lập PaymentExecution với payerId từ PayPal
             PaymentExecution paymentExecution = new PaymentExecution();
             paymentExecution.setPayerId(payerId);
 
+            // Tạo đối tượng Payment của PayPal từ transactionId
             com.paypal.api.payments.Payment payPalPayment = new com.paypal.api.payments.Payment();
             payPalPayment.setId(payment.getTransactionId());
 
-            // Thực hiện thanh toán
+            // Thực hiện thanh toán qua PayPal
             com.paypal.api.payments.Payment executedPayment = payPalPayment.execute(apiContext, paymentExecution);
 
-            // Cập nhật trạng thái thanh toán
+            // Cập nhật trạng thái thanh toán thành SUCCESS và lưu lại thông tin
             payment.setPaymentStatus(PaymentStatus.SUCCESS);
             payment.setTransactionId(executedPayment.getId());
             paymentRepository.save(payment);
 
+            // Trả về PaymentResponse đã ánh xạ từ Payment
             return modelMapper.map(payment, PaymentResponse.class);
         } catch (PayPalRESTException e) {
+            // Nếu có lỗi khi thực hiện thanh toán, cập nhật trạng thái thanh toán là FAILED
             payment.setPaymentStatus(PaymentStatus.FAILED);
             paymentRepository.save(payment);
             throw new RuntimeException("PayPal payment execution failed", e);

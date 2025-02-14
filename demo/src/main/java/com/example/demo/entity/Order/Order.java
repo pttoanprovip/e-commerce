@@ -48,7 +48,7 @@ public class Order {
     private OrderStatus orderStatus = OrderStatus.Pending;
 
     @Column(name = "create_at")
-    private LocalDateTime create_at = LocalDateTime.now();
+    private LocalDateTime createAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems;
