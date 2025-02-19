@@ -10,14 +10,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.entity.User.User_Address;
+import com.example.demo.entity.User.UserAddress;
 
 @Repository
-public interface UserAddressRepository extends JpaRepository<User_Address, Integer> {
-    Optional<List<User_Address>> findByUserId(int userId);
+public interface UserAddressRepository extends JpaRepository<UserAddress, Integer> {
+    Optional<List<UserAddress>> findByUserId(int userId);
 
     @Modifying
     @Transactional
-    @Query("update User_Address ua set ua.defaultAddress = false where ua.user.id = :userId ")
+    @Query("update UserAddress ua set ua.defaultAddress = false where ua.user.id = :userId ")
     void clearDefaultAddress(@Param("userId") int userId);
 }

@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.dto.req.User.UserAddressRequest;
 import com.example.demo.dto.res.User.UserAddressResponse;
 import com.example.demo.entity.User.User;
-import com.example.demo.entity.User.User_Address;
+import com.example.demo.entity.User.UserAddress;
 import com.example.demo.repository.User.UserAddressRepository;
 import com.example.demo.repository.User.UserRepository;
 import com.example.demo.service.User.UserAddressService;
@@ -31,9 +31,9 @@ public class UserAddressServiceImpl implements UserAddressService {
         this.userRepository = userRepository;
 
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
-        modelMapper.createTypeMap(UserAddressRequest.class, User_Address.class)
+        modelMapper.createTypeMap(UserAddressRequest.class, UserAddress.class)
             .addMappings(mapper -> {
-                mapper.skip(User_Address::setId);
+                mapper.skip(UserAddress::setId);
             });
     }
 
@@ -50,11 +50,11 @@ public class UserAddressServiceImpl implements UserAddressService {
         }
 
         // Chuyển đổi từ DTO sang Entity
-        User_Address address = modelMapper.map(userAddressRequest, User_Address.class);
+        UserAddress address = modelMapper.map(userAddressRequest, UserAddress.class);
         address.setUser(user); // Liên kết địa chỉ với người dùng
 
         // Lưu địa chỉ vào cơ sở dữ liệu
-        User_Address saveAddress = userAddressRepository.save(address);
+        UserAddress saveAddress = userAddressRepository.save(address);
 
         // Chuyển đổi đối tượng User_Address thành DTO và trả về
         return modelMapper.map(saveAddress, UserAddressResponse.class);
@@ -64,7 +64,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Transactional
     public void delete(int id) {
         // Tìm địa chỉ theo ID
-        User_Address address = userAddressRepository.findById(id)
+        UserAddress address = userAddressRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
 
         // Xóa địa chỉ
@@ -74,7 +74,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Override
     public List<UserAddressResponse> getUserAddressByUserId(int userId) {
         // Tìm các địa chỉ của người dùng
-        List<User_Address> addresses = userAddressRepository.findByUserId(userId)
+        List<UserAddress> addresses = userAddressRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
 
         // Chuyển đổi từ Entity sang DTO và trả về danh sách
@@ -87,7 +87,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Transactional
     public UserAddressResponse update(int id, UserAddressRequest userAddressRequest) {
         // Tìm địa chỉ theo ID
-        User_Address address = userAddressRepository.findById(id)
+        UserAddress address = userAddressRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
 
         // Nếu yêu cầu là địa chỉ mặc định, cần xóa mặc định cho các địa chỉ khác của
@@ -101,14 +101,14 @@ public class UserAddressServiceImpl implements UserAddressService {
         modelMapper.map(userAddressRequest, address);
 
         // Lưu và trả về địa chỉ đã được cập nhật
-        User_Address updatedAddress = userAddressRepository.save(address);
+        UserAddress updatedAddress = userAddressRepository.save(address);
         return modelMapper.map(updatedAddress, UserAddressResponse.class);
     }
 
     @Override
     public UserAddressResponse getUserAddressById(int id) {
         // Tìm địa chỉ theo ID
-        User_Address address = userAddressRepository.findById(id)
+        UserAddress address = userAddressRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
 
         // Chuyển đổi Entity sang DTO và trả về

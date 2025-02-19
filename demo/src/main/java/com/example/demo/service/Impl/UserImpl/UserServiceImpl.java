@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +20,10 @@ import com.example.demo.repository.User.RoleRepository;
 import com.example.demo.repository.User.UserRepository;
 import com.example.demo.service.User.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
@@ -25,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private PasswordEncoder passwordEncoder;
 
-    //@Autowired
+    // @Autowired
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper,
             RoleRepository roleRepository) {
         this.userRepository = userRepository;
@@ -36,9 +42,9 @@ public class UserServiceImpl implements UserService {
         // Cấu hình lại ModelMapper
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
         modelMapper.createTypeMap(UserRequest.class, User.class)
-            .addMappings(mapper -> {
-                mapper.skip(User::setId);
-            });
+                .addMappings(mapper -> {
+                    mapper.skip(User::setId);
+                });
     }
 
     @Override
@@ -72,6 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PostAuthorize("returnObject.name == authentication.name")
     public UserResponse findById(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -79,7 +86,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin')")
     public List<UserResponse> getAll() {
+        log.info("In method get Users");
         List<User> users = userRepository.findAll();
         return users.stream()
                 .map(user -> modelMapper.map(user, UserResponse.class))
@@ -141,5 +150,16 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         userRepository.delete(user);
+    }
+
+    @Override
+    public UserResponse getMyInfo() {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        User user = userRepository.findByName(name)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return modelMapper.map(user, UserResponse.class);
     }
 }
