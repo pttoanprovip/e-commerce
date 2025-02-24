@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public DiscountResponse create(DiscountRequest discountRequest) {
         // Kiểm tra nếu mã giảm giá đã tồn tại
         Optional<Discount> existDis = discountRepository.findByCode(discountRequest.getCode());
@@ -51,6 +53,7 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public DiscountResponse update(int id, DiscountRequest DiscountRequest) {
         // Tìm mã giảm giá theo ID
         Discount discount = discountRepository.findById(id)
@@ -68,6 +71,7 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public void delete(int id) {
         Discount discount = discountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Discount not found"));
@@ -75,6 +79,7 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin')")
     public List<DiscountResponse> getAll() {
         List<Discount> discounts = discountRepository.findAll();
         return discounts.stream()
@@ -83,6 +88,7 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin')")
     public DiscountResponse getById(int id) {
         Discount discount = discountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Discount not found"));
@@ -90,6 +96,7 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public double applyDiscount(ApplyDiscountRequest applyDiscountRequest, double totalPrice) {
         // Tìm mã giảm giá theo mã code
         Discount discount = discountRepository.findByCode(applyDiscountRequest.getCode())

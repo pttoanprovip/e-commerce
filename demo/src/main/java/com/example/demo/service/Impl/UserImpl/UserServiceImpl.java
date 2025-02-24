@@ -6,9 +6,12 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +53,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
+
+        // Lấy thông tin người tạo từ SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_Admin"));
+
         // Kiểm tra số điện thoại
         if (userRepository.existsByPhone(userRequest.getPhone())) {
             throw new RuntimeException("Phone already exist");
@@ -60,13 +69,21 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Email already exist");
         }
 
-        // Kiểm tra role có tồn tại không
-        Role role = roleRepository.findById(userRequest.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+        // // Kiểm tra role có tồn tại không
+        // Role role = roleRepository.findById(userRequest.getRoleId())
+        // .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        Role role = isAdmin && userRequest.getRoleId() != null
+                // Nếu là Admin và có chọn role, thì lấy role từ request
+                ? roleRepository.findById(userRequest.getRoleId())
+                        .orElseThrow(() -> new RuntimeException("Role not found"))
+
+                // Nếu không phải Admin hoặc không có roleId, mặc định là "USER"
+                : roleRepository.findById(2)
+                        .orElseThrow(() -> new RuntimeException("Role not found"));
 
         // Chuyển đổi dữ liệu từ dto sang entity
         User user = modelMapper.map(userRequest, User.class);
-        System.out.println("User Id aftermapping" + user.getId());
         user.setRole(role);
         user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
 
@@ -78,7 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PostAuthorize("returnObject.name == authentication.name")
+    @PostAuthorize("returnObject.name == authentication.name or hasRole('Admin')")
     public UserResponse findById(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -95,11 +112,25 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @PreAuthorize("#id.toString() == authentication.principal.claims['sub'] or hasRole('Admin')")
     @Override
     @Transactional
     public UserResponse update(int id, UserRequest userRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+        Jwt jwt = (Jwt) jwtAuth.getPrincipal();
+
+        System.out.println("User ID (sub) from token: " + jwt.getClaim("sub"));
+        System.out.println("User ID from response: " + id);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        System.out.println("User ID in DB: " + user.getId());
+
         // Kiểm tra người dùng
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        // User user = userRepository.findById(id).orElseThrow(() -> new
+        // RuntimeException("User not found"));
 
         // Kiểm tra và cập nhật số điện thoại mới nếu có thay đổi
         if (userRequest.getPhone() != null && !userRequest.getPhone().isEmpty()
@@ -141,11 +172,11 @@ public class UserServiceImpl implements UserService {
 
         // Trả về Response
         return modelMapper.map(savaUser, UserResponse.class);
-
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public void delete(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -154,12 +185,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getMyInfo() {
-        var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
+        // var context = SecurityContextHolder.getContext();
+        // String name = context.getAuthentication().getName();
 
-        User user = userRepository.findByName(name)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        // User user = userRepository.findByName(name)
+        // .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return modelMapper.map(user, UserResponse.class);
+        // return modelMapper.map(user, UserResponse.class);
+
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User uesr = userRepository.findById(Integer.parseInt(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return modelMapper.map(uesr, UserResponse.class);
     }
 }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public List<ProductResponse> findAll() {
         List<Product> products = productRepository.findAll();
         return products.stream().map(product -> modelMapper.map(product, ProductResponse.class))
@@ -44,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public ProductResponse findbyId(int id) {
         // tìm kiếm id
         Product product = productRepository.findById(id)
@@ -54,6 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public void delete(int id) {
         // tìm kiếm id nếu sai thì trả về kết quả
         productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found" + id));
@@ -63,6 +67,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public ProductResponse add(ProductRequest productRequest) {
         // Kiểm tra và tìm kiếm Category
         Category category = categoryRepository.findByName(productRequest.getCategory().getName())
@@ -82,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public ProductResponse update(ProductRequest productRequest, int id) {
         // Kiểm tra và tìm kiếm Product
         Product exits = productRepository.findById(id)
@@ -143,6 +149,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public List<ProductResponse> findByCriteria(String name, String category, String brand) {
         try {
             List<Product> products;

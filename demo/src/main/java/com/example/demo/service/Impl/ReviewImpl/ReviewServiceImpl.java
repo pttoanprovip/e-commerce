@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#reviewRequest.userId) == authentication.principal.claims['sub']")
     public void delete(int id) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
@@ -56,6 +58,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#reviewRequest.userId) == authentication.principal.claims['sub']")
     public ReviewResponse update(int id, ReviewRequest reviewRequest) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Review not found"));

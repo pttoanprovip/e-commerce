@@ -13,6 +13,12 @@ import com.example.demo.repository.Cart.CartRepository;
 import com.example.demo.repository.Product.ProductRepository;
 import com.example.demo.repository.User.UserRepository;
 import com.example.demo.service.Cart.CartService;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +41,7 @@ public class CartServiceImpl implements CartService {
     // private final ModelMapper modelMapper;
     private final CartProductRepository cartProductRepository;
 
-    //@Autowired
+    // @Autowired
     public CartServiceImpl(CartRepository cartRepository,
             ProductRepository productRepository, UserRepository userRepository, // ModelMapper modelMapper,
             CartProductRepository cartProductRepository) {
@@ -48,6 +54,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
+    @PreAuthorize("T(String).valueOf(#cartRequest.userId) == authentication.principal.claims['sub']")
     public CartResponse addItem(CartRequest cartRequest) {
         try {
             // // Step 1: Get the cart based on userId or create a new one if it doesn't
@@ -142,7 +149,18 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
+    @PreAuthorize("T(String).valueOf(#cartRequest.userId) == authentication.principal.claims['sub'] or hasRole('Admin')")
     public CartResponse removeItem(CartRequest cartRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+        Jwt jwt = (Jwt) jwtAuth.getPrincipal();
+
+        // Lấy userId từ JWT claims
+        String userIdFromToken = jwt.getClaim("sub");
+
+        System.out.println("User ID from Request: " + cartRequest.getUserId());
+        System.out.println("User ID from Authentication: " + userIdFromToken);
+
         // Tìm giỏ hàng của người dùng
         Cart cart = cartRepository.findByUserId(cartRequest.getUserId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
@@ -208,6 +226,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @PreAuthorize("T(String).valueOf(@cartRepository.findById(#id).orElseThrow().getUser().getId()) == authentication.principal.claims['sub'] or hasRole('Admin')")
     public CartResponse getCart(int id) {
         // Lấy giỏ hàng dựa trên id
         Cart cart = cartRepository.findById(id)

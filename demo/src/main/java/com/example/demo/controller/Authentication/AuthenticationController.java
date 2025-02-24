@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.req.Authentication.AuthenticationRequest;
 import com.example.demo.dto.req.Authentication.IntrospectRequest;
+import com.example.demo.dto.req.Authentication.LogoutRequest;
 import com.example.demo.service.Authentication.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
 
@@ -40,6 +41,19 @@ public class AuthenticationController {
         try {
             var res = authenticationService.introspect(introspectRequest);
             return ResponseEntity.ok(res);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest request)
+            throws JOSEException, ParseException {
+        try {
+            authenticationService.logout(request);
+            return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {

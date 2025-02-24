@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +21,14 @@ import com.example.demo.repository.User.UserAddressRepository;
 import com.example.demo.repository.User.UserRepository;
 import com.example.demo.service.User.UserAddressService;
 
-@Service
+@Service("UserAddressServiceImpl")
 public class UserAddressServiceImpl implements UserAddressService {
 
     private UserRepository userRepository;
     private UserAddressRepository userAddressRepository;
     private final ModelMapper modelMapper;
 
-    //@Autowired
+    // @Autowired
     public UserAddressServiceImpl(UserAddressRepository userAddressRepository, UserRepository userRepository,
             ModelMapper modelMapper) {
         this.userAddressRepository = userAddressRepository;
@@ -32,20 +37,28 @@ public class UserAddressServiceImpl implements UserAddressService {
 
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
         modelMapper.createTypeMap(UserAddressRequest.class, UserAddress.class)
-            .addMappings(mapper -> {
-                mapper.skip(UserAddress::setId);
-            });
+                .addMappings(mapper -> {
+                    mapper.skip(UserAddress::setId);
+                });
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#userAddressRequest.userId) == authentication.principal.claims['sub']")
     public UserAddressResponse create(UserAddressRequest userAddressRequest) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+        Jwt jwt = (Jwt) jwtAuth.getPrincipal();
+
+        System.out.println("User ID (sub) from token: " + jwt.getClaim("sub"));
+        System.out.println("User ID from request: " + userAddressRequest.getUserId());
         // Tìm người dùng từ userId trong yêu cầu
         User user = userRepository.findById(userAddressRequest.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-            
+
         // Nếu địa chỉ mới là mặc định, xóa các địa chỉ mặc định cũ
-        if(userAddressRequest.isDefaultAddress()){
+        if (userAddressRequest.isDefaultAddress()) {
             userAddressRepository.clearDefaultAddress(user.getId());
         }
 
@@ -62,6 +75,7 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#userAddressRequest.userId) == authentication.principal.claims['sub'] ")
     public void delete(int id) {
         // Tìm địa chỉ theo ID
         UserAddress address = userAddressRepository.findById(id)
@@ -72,6 +86,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin')")
     public List<UserAddressResponse> getUserAddressByUserId(int userId) {
         // Tìm các địa chỉ của người dùng
         List<UserAddress> addresses = userAddressRepository.findByUserId(userId)
@@ -85,10 +100,22 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#userAddressRequest.userId) == authentication.principal.claims['sub']")
     public UserAddressResponse update(int id, UserAddressRequest userAddressRequest) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+        Jwt jwt = (Jwt) jwtAuth.getPrincipal();
+
+        System.out.println("User ID (sub) from token: " + jwt.getClaim("sub"));
+        System.out.println("User ID from request: " + userAddressRequest.getUserId());
+
         // Tìm địa chỉ theo ID
         UserAddress address = userAddressRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
+
+        // Debug: In thông tin chủ sở hữu địa chỉ
+        System.out.println("Address Owner ID: " + address.getUser().getId());
 
         // Nếu yêu cầu là địa chỉ mặc định, cần xóa mặc định cho các địa chỉ khác của
         // người dùng
@@ -106,6 +133,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#userAddressRequest.userId) == authentication.principal.claims['sub']")
     public UserAddressResponse getUserAddressById(int id) {
         // Tìm địa chỉ theo ID
         UserAddress address = userAddressRepository.findById(id)

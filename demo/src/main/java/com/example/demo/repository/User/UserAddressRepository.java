@@ -20,4 +20,6 @@ public interface UserAddressRepository extends JpaRepository<UserAddress, Intege
     @Transactional
     @Query("update UserAddress ua set ua.defaultAddress = false where ua.user.id = :userId ")
     void clearDefaultAddress(@Param("userId") int userId);
+
+    boolean existsByIdAndUserId(int id, int userId);
 }

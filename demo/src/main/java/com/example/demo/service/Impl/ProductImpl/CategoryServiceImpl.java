@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public CategoryResponse findById(int id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found" + id));
@@ -35,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public void delete(int id) {
         // tìm kiếm id nếu sai thì trả về kết quả
         categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found" + id));
@@ -43,6 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public CategoryResponse findByName(String name) {
         Category categorys = categoryRepository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("Category not found with name: " + name));
@@ -50,6 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public List<CategoryResponse> findAll() {
         List<Category> categorys = categoryRepository.findAll();
         return categorys.stream().map(category -> modelMapper.map(category, CategoryResponse.class))
@@ -58,6 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public CategoryResponse add(CategoryRequest categoryRequest) {
         // Tạo đối tượng Category từ categoryRequest
         Category category = modelMapper.map(categoryRequest, Category.class);
@@ -69,6 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public CategoryResponse update(CategoryRequest categoryRequest, int id) {
         // tìm kiếm sản phẩm
         Category categorys = categoryRepository.findById(id)

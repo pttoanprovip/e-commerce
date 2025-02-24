@@ -1,6 +1,7 @@
 package com.example.demo.service.Impl.ProductImpl;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public ProductImageResponse findById(int id) {
         Product_Image product_Image = productImageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ProductImage not found with id: " + id));
@@ -37,6 +39,7 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public void delete(int id) {
         // tìm kiếm id nếu sai thì trả về kết quả
         productImageRepository.findById(id)
@@ -47,6 +50,7 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public ProductImageResponse add(ProductImageRequest productImageRequest) {
         Product product = productRepository.findById(productImageRequest.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productImageRequest.getProductId()));
@@ -61,6 +65,7 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public ProductImageResponse update(ProductImageRequest productImageRequest, int id) {
         Product_Image productImage = productImageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ProductImage not found with id: " + id));

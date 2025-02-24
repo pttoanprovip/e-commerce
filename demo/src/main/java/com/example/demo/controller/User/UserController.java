@@ -4,6 +4,7 @@ import java.util.List;
 
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class UserController {
 
     private UserService userService;
 
-    //@Autowired
+    // @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -61,7 +62,7 @@ public class UserController {
         try {
             var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            log.info("Username: {}",authentication.getName());
+            log.info("Username: {}", authentication.getName());
             authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
 
             List<UserResponse> user = userService.getAll();
@@ -75,7 +76,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
-            @PathVariable int id, 
+            @PathVariable int id,
             @RequestBody UserRequest userRequest) {
         try {
             UserResponse user = userService.update(id, userRequest);
@@ -88,7 +89,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable int id){
+    public ResponseEntity<?> delete(@PathVariable int id) {
         try {
             userService.delete(id);
             return ResponseEntity.noContent().build();

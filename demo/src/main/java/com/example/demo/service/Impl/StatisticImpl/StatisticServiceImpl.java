@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ public class StatisticServiceImpl implements StatisticService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public StatisticResponse getStatisticByDay(StatisticRequest statisticRequest) {
         Statistic statistic = new Statistic();
         LocalDateTime start = statisticRequest.getStartDate();
@@ -49,6 +51,7 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public StatisticResponse generateStatisticsReport() {
         Statistic statistic = new Statistic();
         LocalDateTime now = LocalDateTime.now();
@@ -75,6 +78,7 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin')")
     public StatisticResponse getById(int id) {
         Statistic statistic = statisticRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Statistic not found"));

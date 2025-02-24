@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
     private DiscountService discountService;
     private final ModelMapper modelMapper;
 
-    //@Autowired
+    // @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository,
             ProductRepository productRepository, UserRepository userRepository, CartRepository cartRepository,
             ModelMapper modelMapper, DiscountService discountService) {
@@ -53,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @PreAuthorize("T(String).valueOf(#orderRequest.userId) == authentication.principal.claims['sub']")
     public OrderResponse placeOrder(OrderRequest orderRequest) {
 
         User user = userRepository.findById(orderRequest.getUserId())
@@ -145,7 +151,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(@orderRepository.findById(#id).orElseThrow().getUser().getId()) == authentication.principal.claims['sub']")
     public OrderResponse getOrderById(int id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+        Jwt jwt = (Jwt) jwtAuth.getPrincipal();
+
+        String userIdFromToken = jwt.getClaim("sub");
+        System.out.println("User ID from token: " + userIdFromToken);
+        System.out.println("Checking order ID: " + id);
         // Lấy Order theo Id
         Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -170,6 +184,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#userId) == authentication.principal.claims['sub']")
     public List<OrderResponse> getUserById(int userId) {
         // Lấy tất cả order của user theo userId
         List<Order> orders = orderRepository.findByUserId(userId)
