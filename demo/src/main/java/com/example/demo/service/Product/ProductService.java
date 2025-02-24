@@ -24,7 +24,20 @@ public interface ProductService {
 
     List<ProductResponse> findByCategoryAndBrand(String category, String brand);
 
-    List<ProductResponse> findByNameAndBrand(String name, String brand);      
-    
-    List<ProductResponse> findByCriteria(String name, String category, String brand);
+    List<ProductResponse> findByNameAndBrand(String name, String brand);
+
+    List<ProductResponse> findByCriteria(String name, String category, String brand, String cpu, String ram,
+            String storage, String screenSize, double price, double minPrice, double maxPrice);
+
+    List<ProductResponse> findByCpu(String cpu);
+
+    List<ProductResponse> findByRam(String ram);
+
+    List<ProductResponse> findByStorage(String storage);
+
+    List<ProductResponse> findByScreenSize(String screenSize);
+
+    List<ProductResponse> findByPrice(double price);
+
+    List<ProductResponse> findByPriceRange(double minPrice, double maxPrice);
 }

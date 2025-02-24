@@ -29,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
     private final ModelMapper modelMapper;
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
-    //@Autowired
+    // @Autowired
     public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository,
             ModelMapper modelMapper) {
         this.productRepository = productRepository;
@@ -149,8 +149,51 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductResponse> findByCpu(String cpu) {
+        List<Product> products = productRepository.findByCpu(cpu);
+        return products.stream().map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponse> findByRam(String ram) {
+        List<Product> products = productRepository.findByRam(ram);
+        return products.stream().map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponse> findByStorage(String storage) {
+        List<Product> products = productRepository.findByStorage(storage);
+        return products.stream().map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponse> findByScreenSize(String screenSize) {
+        List<Product> products = productRepository.findByScreenSize(screenSize);
+        return products.stream().map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponse> findByPrice(double price) {
+        List<Product> products = productRepository.findByPrice(price);
+        return products.stream().map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponse> findByPriceRange(double minPrice, double maxPrice) {
+        List<Product> products = productRepository.findByPriceRange(minPrice, maxPrice);
+        return products.stream().map(product -> modelMapper.map(product, ProductResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @PreAuthorize("hasRole('Admin') or hasRole('User')")
-    public List<ProductResponse> findByCriteria(String name, String category, String brand) {
+    public List<ProductResponse> findByCriteria(String name, String category, String brand, String cpu, String ram,
+            String storage, String screenSize, double price, double minPrice, double maxPrice) {
         try {
             List<Product> products;
             if (name != null && brand != null) {
@@ -167,6 +210,18 @@ public class ProductServiceImpl implements ProductService {
                 products = productRepository.findByCategory(categoryEntity);
             } else if (brand != null) {
                 products = productRepository.findByBrand(brand);
+            } else if (cpu != null) {
+                products = productRepository.findByCpu(cpu);
+            } else if (ram != null) {
+                products = productRepository.findByRam(ram);
+            } else if (storage != null) {
+                products = productRepository.findByStorage(storage);
+            } else if (screenSize != null) {
+                products = productRepository.findByScreenSize(screenSize);
+            } else if (price != 0) {
+                products = productRepository.findByPrice(price);
+            } else if (minPrice != 0 && maxPrice != 0) {
+                products = productRepository.findByPriceRange(minPrice, maxPrice);
             } else {
                 products = productRepository.findAll();
             }
@@ -177,4 +232,5 @@ public class ProductServiceImpl implements ProductService {
             return Collections.emptyList();
         }
     }
+
 }

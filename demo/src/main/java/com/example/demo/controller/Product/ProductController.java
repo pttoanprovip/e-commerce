@@ -27,7 +27,7 @@ public class ProductController {
     private ProductService productService;
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-    //@Autowired
+    // @Autowired
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
@@ -96,10 +96,18 @@ public class ProductController {
     public ResponseEntity<?> getProductByCriteria(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) String brand) {
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) double price,
+            @RequestParam(required = false) String cpu,
+            @RequestParam(required = false) String ram,
+            @RequestParam(required = false) String storage,
+            @RequestParam(required = false) String screenSize,
+            @RequestParam(required = false) double minPrice,
+            @RequestParam(required = false) double maxPrice) {
         try {
             logger.debug("name: {}, brand: {}, category: {}", name, brand, category);
-            List<ProductResponse> products = productService.findByCriteria(name, category, brand);
+            List<ProductResponse> products = productService.findByCriteria(name, category, brand, screenSize, cpu, ram,
+                    storage, price, minPrice, maxPrice);
             if (products.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
