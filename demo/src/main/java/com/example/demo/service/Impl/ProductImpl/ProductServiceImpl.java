@@ -184,8 +184,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> findByPriceRange(double minPrice, double maxPrice) {
-        List<Product> products = productRepository.findByPriceRange(minPrice, maxPrice);
+    public List<ProductResponse> findByPriceBetween(double minPrice, double maxPrice) {
+        List<Product> products = productRepository.findByPriceBetween(minPrice, maxPrice);
         return products.stream().map(product -> modelMapper.map(product, ProductResponse.class))
                 .collect(Collectors.toList());
     }
@@ -221,7 +221,7 @@ public class ProductServiceImpl implements ProductService {
             } else if (price != 0) {
                 products = productRepository.findByPrice(price);
             } else if (minPrice != 0 && maxPrice != 0) {
-                products = productRepository.findByPriceRange(minPrice, maxPrice);
+                products = productRepository.findByPriceBetween(minPrice, maxPrice);
             } else {
                 products = productRepository.findAll();
             }

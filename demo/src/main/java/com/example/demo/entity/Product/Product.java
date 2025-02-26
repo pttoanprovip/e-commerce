@@ -47,7 +47,7 @@ public class Product {
     private String storage;
 
     @Column(name = "screen_size")
-    private String screen_size;
+    private String screenSize;
 
     @Column(name = "brand")
     private String brand;

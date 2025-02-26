@@ -1,14 +1,16 @@
-package com.example.demo.service.Product;
+    package com.example.demo.service.Product;
 
-import com.example.demo.dto.req.Product.ProductImageRequest;
-import com.example.demo.dto.res.Product.ProductImageResponse;
+    import org.springframework.web.multipart.MultipartFile;
 
-public interface ProductImageService {
-    ProductImageResponse findById(int id);
+    import com.example.demo.dto.req.Product.ProductImageRequest;
+    import com.example.demo.dto.res.Product.ProductImageResponse;
 
-    void delete(int id);
+    public interface ProductImageService {
+        ProductImageResponse findById(int id);
 
-    ProductImageResponse add(ProductImageRequest productImageRequest);
+        void delete(int id);
 
-    ProductImageResponse update(ProductImageRequest productImageRequest, int id);
-}
+        ProductImageResponse add(ProductImageRequest productImageRequest, MultipartFile file);
+
+        ProductImageResponse update(ProductImageRequest productImageRequest, int id, MultipartFile file);
+    }

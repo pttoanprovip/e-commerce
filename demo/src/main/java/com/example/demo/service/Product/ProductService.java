@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.demo.dto.req.Product.ProductRequest;
 import com.example.demo.dto.res.Product.ProductResponse;
+import com.example.demo.entity.Product.Product;
 
 public interface ProductService {
     List<ProductResponse> findAll();
@@ -39,5 +40,6 @@ public interface ProductService {
 
     List<ProductResponse> findByPrice(double price);
 
-    List<ProductResponse> findByPriceRange(double minPrice, double maxPrice);
+    List<ProductResponse> findByPriceBetween(double minPrice, double maxPrice);
+
 }
