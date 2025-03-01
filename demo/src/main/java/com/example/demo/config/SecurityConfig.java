@@ -33,28 +33,47 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = { "/users", "/auth/token", "/auth/introspect", "/auth/logout", };
 
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
+    // Exception {
+    // // http
+    // // .csrf(csrf -> csrf.disable()) // Tắt CSRF cho API
+    // // .authorizeHttpRequests(auth -> auth
+    // // .requestMatchers(HttpMethod.GET, "/users")
+    // // .hasRole("Admin") // Cho phép tất cả các phương thức tại /users
+    // // .requestMatchers("/payments/**").permitAll()
+    // // .anyRequest().permitAll() // Cho phép tất cả các request khác mà không cần
+    // // xác thực
+    // // ).oauth2ResourceServer(oauth2 -> oauth2
+    // // .jwt(jwt ->
+    // jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+
+    // http.authorizeHttpRequests(request ->
+    // request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+    // // .requestMatchers(HttpMethod.GET, "/users")
+    // // .hasRole("Admin")
+    // .anyRequest().authenticated());
+
+    // http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfiguer ->
+    // jwtConfiguer.decoder(jwtDecoder())
+    // .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+
+    // http.csrf(csrf -> csrf.disable());
+
+    // http.cors(cors -> cors.configure(http));
+
+    // return http.build();
+    // }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // http
-        // .csrf(csrf -> csrf.disable()) // Tắt CSRF cho API
-        // .authorizeHttpRequests(auth -> auth
-        // .requestMatchers(HttpMethod.GET, "/users")
-        // .hasRole("Admin") // Cho phép tất cả các phương thức tại /users
-        // .requestMatchers("/payments/**").permitAll()
-        // .anyRequest().permitAll() // Cho phép tất cả các request khác mà không cần
-        // xác thực
-        // ).oauth2ResourceServer(oauth2 -> oauth2
-        // .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
-
-        http.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                // .requestMatchers(HttpMethod.GET, "/users")
-                // .hasRole("Admin")
-                .anyRequest().authenticated());
-
-        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfiguer -> jwtConfiguer.decoder(jwtDecoder())
-                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
-
-        http.csrf(csrf -> csrf.disable());
+        http.cors(cors -> cors.configure(http)) // Thêm dòng này để Spring Security không chặn CORS
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwtConfiguer -> jwtConfiguer.decoder(jwtDecoder())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }
@@ -98,5 +117,4 @@ public class SecurityConfig {
         return converter;
     }
 
-    
 }
