@@ -55,6 +55,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public void delete(int id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
@@ -62,6 +63,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin')")
     public List<RoleResponse> getAll() {
         List<Role> roles = roleRepository.findAll();
         return roles.stream()
