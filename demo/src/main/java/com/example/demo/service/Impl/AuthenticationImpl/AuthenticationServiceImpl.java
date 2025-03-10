@@ -8,7 +8,9 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.req.Authentication.AuthenticationRequest;
 import com.example.demo.dto.req.Authentication.IntrospectRequest;
@@ -16,8 +18,10 @@ import com.example.demo.dto.req.Authentication.LogoutRequest;
 import com.example.demo.dto.res.Authentication.AuthenticationResponse;
 import com.example.demo.dto.res.Authentication.IntrospectResponse;
 import com.example.demo.entity.User.InvalidatedToken;
+import com.example.demo.entity.User.Role;
 import com.example.demo.entity.User.User;
 import com.example.demo.repository.User.InvalidatedTokenRepository;
+import com.example.demo.repository.User.RoleRepository;
 import com.example.demo.repository.User.UserRepository;
 import com.example.demo.service.Authentication.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
@@ -39,6 +43,7 @@ import lombok.experimental.NonFinal;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final InvalidatedTokenRepository invalidatedTokenRepository;
 
@@ -97,7 +102,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             verifyToken(token);
         } catch (Exception e) {
-            isVaild = false;    
+            isVaild = false;
         }
 
         return IntrospectResponse.builder()
@@ -143,5 +148,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         return signedJWT;
+    }
+
+    @Override
+    @Transactional
+    public AuthenticationResponse authenticateOAuth2(OAuth2User oAuth2User) {
+        String email = oAuth2User.getAttribute("email");
+        String name = oAuth2User.getAttribute("name");
+
+        User user = userRepository.findByEmail(email).orElseGet(() -> {
+            Role userRole = roleRepository.findByRoleName("User")
+                    .orElseThrow(() -> new RuntimeException("Role not found"));
+            User newU = User.builder()
+                    .email(email)
+                    .name(name)
+                    .role(userRole)
+                    .build();
+            return userRepository.save(newU);
+        });
+
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 }

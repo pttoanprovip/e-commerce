@@ -2,6 +2,8 @@ package com.example.demo.service.Authentication;
 
 import java.text.ParseException;
 
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
 import com.example.demo.dto.req.Authentication.AuthenticationRequest;
 import com.example.demo.dto.req.Authentication.IntrospectRequest;
 import com.example.demo.dto.req.Authentication.LogoutRequest;
@@ -16,5 +18,5 @@ public interface AuthenticationService {
 
      void logout(LogoutRequest request) throws JOSEException, ParseException;
 
-
+     AuthenticationResponse authenticateOAuth2(OAuth2User oAuth2User);
 }

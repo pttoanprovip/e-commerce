@@ -41,9 +41,10 @@ public class RoleServiceImpl implements RoleService {
     @PreAuthorize("hasRole('Admin')")
     public RoleResponse update(int id, RoleRequest roleRequest) {
         Role role = roleRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        if(!role.getRoleName().equals(roleRequest.getRoleName())) {
+        if (!role.getRoleName().equals(roleRequest.getRoleName())
+                && roleRepository.existsByRoleName(roleRequest.getRoleName())) {
             throw new RuntimeException("Role already exists");
         }
 
@@ -59,7 +60,7 @@ public class RoleServiceImpl implements RoleService {
     public void delete(int id) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
-                roleRepository.delete(role);
+        roleRepository.delete(role);
     }
 
     @Override

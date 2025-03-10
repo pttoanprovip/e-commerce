@@ -3,6 +3,9 @@ package com.example.demo.controller.Authentication;
 import java.text.ParseException;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,5 +62,22 @@ public class AuthenticationController {
         } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
+    }
+
+    @GetMapping("/oauth2/success")
+    public ResponseEntity<?> oauth2Success(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        try {
+            var res = authenticationService.authenticateOAuth2(oAuth2User);
+            return ResponseEntity.ok(res);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/oauth2/failure")
+    public ResponseEntity<?> oauth2Failure() {
+        return ResponseEntity.badRequest().body("OAuth2 login failed");
     }
 }

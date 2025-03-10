@@ -28,93 +28,127 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${jwt.signerKey}")
-    private String signerKey;
+        @Value("${jwt.signerKey}")
+        private String signerKey;
 
-    private final String[] PUBLIC_ENDPOINTS = { "/users", "/auth/token", "/auth/introspect", "/auth/logout", };
+        private final String[] PUBLIC_ENDPOINTS = { "/users", "/auth/token", "/auth/introspect", "/auth/logout", };
 
-    // @Bean
-    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
-    // Exception {
-    // // http
-    // // .csrf(csrf -> csrf.disable()) // Tắt CSRF cho API
-    // // .authorizeHttpRequests(auth -> auth
-    // // .requestMatchers(HttpMethod.GET, "/users")
-    // // .hasRole("Admin") // Cho phép tất cả các phương thức tại /users
-    // // .requestMatchers("/payments/**").permitAll()
-    // // .anyRequest().permitAll() // Cho phép tất cả các request khác mà không cần
-    // // xác thực
-    // // ).oauth2ResourceServer(oauth2 -> oauth2
-    // // .jwt(jwt ->
-    // jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+        // @Bean
+        // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
+        // Exception {
+        // // http
+        // // .csrf(csrf -> csrf.disable()) // Tắt CSRF cho API
+        // // .authorizeHttpRequests(auth -> auth
+        // // .requestMatchers(HttpMethod.GET, "/users")
+        // // .hasRole("Admin") // Cho phép tất cả các phương thức tại /users
+        // // .requestMatchers("/payments/**").permitAll()
+        // // .anyRequest().permitAll() // Cho phép tất cả các request khác mà không cần
+        // // xác thực
+        // // ).oauth2ResourceServer(oauth2 -> oauth2
+        // // .jwt(jwt ->
+        // jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
-    // http.authorizeHttpRequests(request ->
-    // request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-    // // .requestMatchers(HttpMethod.GET, "/users")
-    // // .hasRole("Admin")
-    // .anyRequest().authenticated());
+        // http.authorizeHttpRequests(request ->
+        // request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+        // // .requestMatchers(HttpMethod.GET, "/users")
+        // // .hasRole("Admin")
+        // .anyRequest().authenticated());
 
-    // http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfiguer ->
-    // jwtConfiguer.decoder(jwtDecoder())
-    // .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+        // http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfiguer ->
+        // jwtConfiguer.decoder(jwtDecoder())
+        // .jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
-    // http.csrf(csrf -> csrf.disable());
+        // http.csrf(csrf -> csrf.disable());
 
-    // http.cors(cors -> cors.configure(http));
+        // http.cors(cors -> cors.configure(http));
 
-    // return http.build();
-    // }
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configure(http)) // Thêm dòng này để Spring Security không chặn CORS
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwtConfiguer -> jwtConfiguer.decoder(jwtDecoder())
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .csrf(csrf -> csrf.disable());
+        // return http.build();
+        // }
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                System.out.println("Configuring SecurityFilterChain with OAuth2 login");
+                // http.cors(cors -> cors.configure(http)) // Thêm dòng này để Spring Security
+                // không chặn CORS
+                // .authorizeHttpRequests(request -> request
+                // .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                // .requestMatchers(HttpMethod.GET, "/auth/google", "/auth/oauth2/**")
+                // .permitAll()
+                // .requestMatchers("/login/oauth2/code/**").permitAll()
+                // .anyRequest().authenticated())
+                // .oauth2ResourceServer(oauth2 -> oauth2
+                // .jwt(jwtConfiguer -> jwtConfiguer.decoder(jwtDecoder())
+                // .jwtAuthenticationConverter(
+                // jwtAuthenticationConverter())))
+                // .oauth2Login(oauth2 -> oauth2
+                // .authorizationEndpoint(auth -> auth
+                // .baseUri("/auth/google"))
+                // .redirectionEndpoint(red -> red
+                // .baseUri("/login/oauth2/code/*"))
+                // .defaultSuccessUrl("/auth/oauth2/success", true)
+                // .failureUrl("/auth/oauth2/failure"))
+                // .csrf(csrf -> csrf.disable());
 
-        return http.build();
-    }
+                http.cors(cors -> cors.configure(http))
+                                .authorizeHttpRequests(request -> request
+                                                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/auth/google", "/auth/oauth2/**")
+                                                .permitAll()
+                                                .requestMatchers("/login/oauth2/code/**").permitAll()
+                                                .anyRequest().authenticated())
+                                .oauth2ResourceServer(oauth2 -> oauth2
+                                                .jwt(jwtConfigurer -> jwtConfigurer
+                                                                .decoder(jwtDecoder())
+                                                                .jwtAuthenticationConverter(
+                                                                                jwtAuthenticationConverter())))
+                                .oauth2Login(oauth2 -> oauth2
+                                                .authorizationEndpoint(auth -> auth
+                                                                .baseUri("/auth/google"))
+                                                .redirectionEndpoint(red -> red
+                                                                .baseUri("/login/oauth2/code/*"))
+                                                .defaultSuccessUrl("/auth/oauth2/success", true)
+                                                .failureUrl("/auth/oauth2/failure"))
+                                .csrf(csrf -> csrf.disable());
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKeySpec keySpec = new SecretKeySpec(signerKey.getBytes(), "HS512"); // Tạo SecretKeySpec
-        return NimbusJwtDecoder
-                .withSecretKey(keySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        // JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        // converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-        // System.out.println("JWT Claims: " + jwt.getClaims()); // In toàn bộ claim để
-        // kiểm tra
+        @Bean
+        public JwtDecoder jwtDecoder() {
+                SecretKeySpec keySpec = new SecretKeySpec(signerKey.getBytes(), "HS512"); // Tạo SecretKeySpec
+                return NimbusJwtDecoder
+                                .withSecretKey(keySpec)
+                                .macAlgorithm(MacAlgorithm.HS512)
+                                .build();
+        }
 
-        // List<String> roles = jwt.getClaim("roles"); // Kiểm tra claim "roles"
-        // if (roles == null)
-        // return List.of();
+        @Bean
+        public JwtAuthenticationConverter jwtAuthenticationConverter() {
+                // JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+                // converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+                // System.out.println("JWT Claims: " + jwt.getClaims()); // In toàn bộ claim để
+                // kiểm tra
 
-        // return roles.stream()
-        // .map(role -> new SimpleGrantedAuthority("ROLE_" + role)) // Kiểm tra định
-        // dạng
-        // .collect(Collectors.toList());
-        // });
-        // return converter;
+                // List<String> roles = jwt.getClaim("roles"); // Kiểm tra claim "roles"
+                // if (roles == null)
+                // return List.of();
 
-        JwtGrantedAuthoritiesConverter gConverter = new JwtGrantedAuthoritiesConverter();
-        gConverter.setAuthorityPrefix("ROLE_");
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(gConverter);
-        return converter;
-    }
+                // return roles.stream()
+                // .map(role -> new SimpleGrantedAuthority("ROLE_" + role)) // Kiểm tra định
+                // dạng
+                // .collect(Collectors.toList());
+                // });
+                // return converter;
+
+                JwtGrantedAuthoritiesConverter gConverter = new JwtGrantedAuthoritiesConverter();
+                gConverter.setAuthorityPrefix("ROLE_");
+                JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+                converter.setJwtGrantedAuthoritiesConverter(gConverter);
+                return converter;
+        }
 
 }
