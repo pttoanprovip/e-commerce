@@ -184,6 +184,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasRole('Admin') or hasRole('User')")
     public UserResponse getMyInfo() {
         // var context = SecurityContextHolder.getContext();
         // String name = context.getAuthentication().getName();
