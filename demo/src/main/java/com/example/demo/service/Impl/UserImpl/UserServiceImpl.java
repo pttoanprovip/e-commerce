@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PostAuthorize("returnObject.name == authentication.name or hasRole('Admin')")
+    @PostAuthorize("#id.toString() == authentication.principal.claims['sub']  or hasRole('Admin')")
     public UserResponse findById(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));

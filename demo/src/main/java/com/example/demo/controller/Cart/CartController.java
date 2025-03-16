@@ -18,7 +18,7 @@ import com.example.demo.service.Cart.CartService;
 public class CartController {
     private final CartService cartService;
 
-    //@Autowired
+    // @Autowired
     public CartController(CartService cartService) {
         this.cartService = cartService;
     }
@@ -28,35 +28,47 @@ public class CartController {
         try {
             CartResponse cart = cartService.addItem(cartRequest);
             return ResponseEntity.ok(cart);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }  catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<?> removeItem(@RequestBody CartRequest cartRequest){
+    public ResponseEntity<?> removeItem(@RequestBody CartRequest cartRequest) {
         try {
             CartResponse cart = cartService.removeItem(cartRequest);
             return ResponseEntity.ok(cart);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }  catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(500).build();
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCart(@PathVariable int id){
+    public ResponseEntity<?> getCart(@PathVariable int id) {
         try {
             CartResponse cart = cartService.getCart(id);
             return ResponseEntity.ok(cart);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }  catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(500).build();
-        }   
+        }
+    }
+
+    @GetMapping("user/{userId}")
+    public ResponseEntity<?> getUserIdCart(@PathVariable int userId) {
+        try {
+            CartResponse cart = cartService.getUserIdCart(userId);
+            return ResponseEntity.ok(cart);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error");
+        }
     }
 
 }

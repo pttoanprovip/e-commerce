@@ -254,4 +254,34 @@ public class CartServiceImpl implements CartService {
         return cartResponse;
     }
 
+    @Override
+    @PreAuthorize("T(String).valueOf(@cartRepository.findByUserId(#userId).orElseThrow().getUser().getId()) == authentication.principal.claims['sub'] or hasRole('Admin')")
+    public CartResponse getUserIdCart(int userId) {
+        Optional<Cart> cartOpt = cartRepository.findByUserId(userId);
+    
+    CartResponse cartResponse = new CartResponse();
+    if (cartOpt.isPresent()) {
+        Cart cart = cartOpt.get();
+        cartResponse.setId(cart.getId());
+
+        List<CartProductResponse> cartProductResponses = cart.getCart_products().stream().map(cartProduct -> {
+            CartProductResponse cartProductResponse = new CartProductResponse();
+            cartProductResponse.setId(cartProduct.getProduct().getId());
+            cartProductResponse.setProductName(cartProduct.getProduct().getName());
+            cartProductResponse.setQuantity(cartProduct.getQuantity());
+            cartProductResponse.setPrice(cartProduct.getProduct().getPrice());
+            return cartProductResponse;
+        }).collect(Collectors.toList());
+
+        cartResponse.setCartProduct(cartProductResponses);
+        cartResponse.setTotal_price(cart.getTotal_price());
+    } else {
+        cartResponse.setId(0); // hoặc bỏ qua nếu không cần
+        cartResponse.setCartProduct(new ArrayList<>());
+        cartResponse.setTotal_price(0.0);
+    }
+
+    return cartResponse;
+    }
+
 }

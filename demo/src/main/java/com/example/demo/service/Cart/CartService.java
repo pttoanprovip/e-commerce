@@ -9,4 +9,6 @@ public interface CartService {
     CartResponse removeItem(CartRequest cartRequest);
 
     CartResponse getCart(int id);
+
+    CartResponse getUserIdCart(int userId);
 }
