@@ -56,54 +56,130 @@ public class CartServiceImpl implements CartService {
     @Transactional
     @PreAuthorize("T(String).valueOf(#cartRequest.userId) == authentication.principal.claims['sub']")
     public CartResponse addItem(CartRequest cartRequest) {
+
+        // // Step 1: Get the cart based on userId or create a new one if it doesn't
+        // exist
+        // Cart cart = cartRepository.findById(cartRequest.getUserId())
+        // .orElseGet(() -> {
+        // User user = userRepository.findById(cartRequest.getUserId())
+        // .orElseThrow(() -> new RuntimeException("User not found"));
+        // Cart newCart = new Cart();
+        // newCart.setUser(user);
+        // newCart.setCart_products(new ArrayList<>()); // Initialize the cart_products
+        // list
+        // return newCart;
+        // });
+
+        // new
+
+        // Bước 1: Lấy giỏ hàng dựa trên userId hoặc tạo mới nếu giỏ hàng chưa tồn tại
+        // Cart cart;
+        // Optional<Cart> existingCart =
+        // cartRepository.findByUserId(cartRequest.getUserId());
+
+        // if (existingCart.isPresent()) {
+        // cart = existingCart.get(); // Sử dụng giỏ hàng hiện tại
+        // } else {
+        // User user = userRepository.findById(cartRequest.getUserId())
+        // .orElseThrow(() -> new RuntimeException("Not found user"));
+        // cart = new Cart();
+        // cart.setUser(user);
+        // cart.setCart_products(new ArrayList<>()); // Khởi tạo danh sách trống
+        // }
+
+        // // Bước 2: Xử lý danh sách sản phẩm trong yêu cầu
+        // List<Cart_Product> existingCartProducts = cart.getCart_products();
+        // for (CartProductRequest cartProductRequest : cartRequest.getCartProduct()) {
+        // Product product =
+        // productRepository.findById(cartProductRequest.getProductId())
+        // .orElseThrow(() -> new RuntimeException("Not found product"));
+
+        // // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
+        // Cart_Product existingCartProduct = existingCartProducts.stream()
+        // .filter(cp -> cp.getProduct().equals(product))
+        // .findFirst()
+        // .orElse(null);
+
+        // if (existingCartProduct != null) {
+        // // Cập nhật số lượng nếu sản phẩm đã tồn tại trong giỏ hàng
+        // existingCartProduct
+        // .setQuantity(existingCartProduct.getQuantity() +
+        // cartProductRequest.getQuantity());
+        // } else {
+        // // Thêm sản phẩm mới vào giỏ hàng
+        // Cart_Product newCartProduct = new Cart_Product();
+        // newCartProduct.setCart(cart);
+        // newCartProduct.setProduct(product);
+        // newCartProduct.setQuantity(cartProductRequest.getQuantity());
+        // existingCartProducts.add(newCartProduct);
+        // }
+        // }
+
+        // // Tính tổng giá và cập nhật lại
+        // double totalPrice = cart.getCart_products().stream()
+        // .mapToDouble(cart_Product -> cart_Product.getProduct().getPrice() *
+        // cart_Product.getQuantity())
+        // .sum();
+
+        // cart.setTotal_price(totalPrice);
+
+        // // Lưu giỏ hàng đã được cập nhật
+        // cart.setCart_products(existingCartProducts);
+        // Cart savedCart = cartRepository.save(cart);
+
+        // // Tạo phản hồi CartResponse thủ công
+        // CartResponse cartResponse = new CartResponse();
+        // cartResponse.setId(savedCart.getId());
+        // cartResponse.setCartProduct(savedCart.getCart_products().stream().map(cartProduct
+        // -> {
+        // CartProductResponse cartProductResponse = new CartProductResponse();
+        // cartProductResponse.setId(cartProduct.getProduct().getId());
+        // cartProductResponse.setProductName(cartProduct.getProduct().getName());
+        // cartProductResponse.setQuantity(cartProduct.getQuantity());
+        // cartProductResponse.setPrice(cartProduct.getProduct().getPrice());
+        // return cartProductResponse;
+        // }).collect(Collectors.toList()));
+
+        // cartResponse.setTotal_price(savedCart.getTotal_price());
+
+        // return cartResponse;
+
+        // // Chuyển đổi giỏ hàng đã lưu thành CartResponse và trả về
+        // // return modelMapper.map(savedCart, CartResponse.class);
+        // } catch (Exception e) {
+        // logger.error("Lỗi khi thêm sản phẩm vào giỏ hàng", e);
+        // throw e;
+        // }
+
         try {
-            // // Step 1: Get the cart based on userId or create a new one if it doesn't
-            // exist
-            // Cart cart = cartRepository.findById(cartRequest.getUserId())
-            // .orElseGet(() -> {
-            // User user = userRepository.findById(cartRequest.getUserId())
-            // .orElseThrow(() -> new RuntimeException("User not found"));
-            // Cart newCart = new Cart();
-            // newCart.setUser(user);
-            // newCart.setCart_products(new ArrayList<>()); // Initialize the cart_products
-            // list
-            // return newCart;
-            // });
-
-            // new
-
-            // Bước 1: Lấy giỏ hàng dựa trên userId hoặc tạo mới nếu giỏ hàng chưa tồn tại
+            // Lấy hoặc tạo giỏ hàng
             Cart cart;
             Optional<Cart> existingCart = cartRepository.findByUserId(cartRequest.getUserId());
-
             if (existingCart.isPresent()) {
-                cart = existingCart.get(); // Sử dụng giỏ hàng hiện tại
+                cart = existingCart.get();
             } else {
                 User user = userRepository.findById(cartRequest.getUserId())
                         .orElseThrow(() -> new RuntimeException("Not found user"));
                 cart = new Cart();
                 cart.setUser(user);
-                cart.setCart_products(new ArrayList<>()); // Khởi tạo danh sách trống
+                cart.setCart_products(new ArrayList<>());
             }
 
-            // Bước 2: Xử lý danh sách sản phẩm trong yêu cầu
             List<Cart_Product> existingCartProducts = cart.getCart_products();
             for (CartProductRequest cartProductRequest : cartRequest.getCartProduct()) {
                 Product product = productRepository.findById(cartProductRequest.getProductId())
                         .orElseThrow(() -> new RuntimeException("Not found product"));
 
-                // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
                 Cart_Product existingCartProduct = existingCartProducts.stream()
                         .filter(cp -> cp.getProduct().equals(product))
                         .findFirst()
                         .orElse(null);
 
                 if (existingCartProduct != null) {
-                    // Cập nhật số lượng nếu sản phẩm đã tồn tại trong giỏ hàng
-                    existingCartProduct
-                            .setQuantity(existingCartProduct.getQuantity() + cartProductRequest.getQuantity());
+                    // Thiết lập số lượng mới thay vì tăng
+                    existingCartProduct.setQuantity(cartProductRequest.getQuantity());
                 } else {
-                    // Thêm sản phẩm mới vào giỏ hàng
+                    // Thêm sản phẩm mới
                     Cart_Product newCartProduct = new Cart_Product();
                     newCartProduct.setCart(cart);
                     newCartProduct.setProduct(product);
@@ -112,18 +188,16 @@ public class CartServiceImpl implements CartService {
                 }
             }
 
-            // Tính tổng giá và cập nhật lại
+            // Tính tổng giá
             double totalPrice = cart.getCart_products().stream()
-                    .mapToDouble(cart_Product -> cart_Product.getProduct().getPrice() * cart_Product.getQuantity())
+                    .mapToDouble(cartProduct -> cartProduct.getProduct().getPrice() * cartProduct.getQuantity())
                     .sum();
-
             cart.setTotal_price(totalPrice);
 
-            // Lưu giỏ hàng đã được cập nhật
-            cart.setCart_products(existingCartProducts);
+            // Lưu giỏ hàng
             Cart savedCart = cartRepository.save(cart);
 
-            // Tạo phản hồi CartResponse thủ công
+            // Tạo phản hồi
             CartResponse cartResponse = new CartResponse();
             cartResponse.setId(savedCart.getId());
             cartResponse.setCartProduct(savedCart.getCart_products().stream().map(cartProduct -> {
@@ -134,13 +208,9 @@ public class CartServiceImpl implements CartService {
                 cartProductResponse.setPrice(cartProduct.getProduct().getPrice());
                 return cartProductResponse;
             }).collect(Collectors.toList()));
-
             cartResponse.setTotal_price(savedCart.getTotal_price());
 
             return cartResponse;
-
-            // Chuyển đổi giỏ hàng đã lưu thành CartResponse và trả về
-            // return modelMapper.map(savedCart, CartResponse.class);
         } catch (Exception e) {
             logger.error("Lỗi khi thêm sản phẩm vào giỏ hàng", e);
             throw e;
@@ -258,30 +328,30 @@ public class CartServiceImpl implements CartService {
     @PreAuthorize("T(String).valueOf(@cartRepository.findByUserId(#userId).orElseThrow().getUser().getId()) == authentication.principal.claims['sub'] or hasRole('Admin')")
     public CartResponse getUserIdCart(int userId) {
         Optional<Cart> cartOpt = cartRepository.findByUserId(userId);
-    
-    CartResponse cartResponse = new CartResponse();
-    if (cartOpt.isPresent()) {
-        Cart cart = cartOpt.get();
-        cartResponse.setId(cart.getId());
 
-        List<CartProductResponse> cartProductResponses = cart.getCart_products().stream().map(cartProduct -> {
-            CartProductResponse cartProductResponse = new CartProductResponse();
-            cartProductResponse.setId(cartProduct.getProduct().getId());
-            cartProductResponse.setProductName(cartProduct.getProduct().getName());
-            cartProductResponse.setQuantity(cartProduct.getQuantity());
-            cartProductResponse.setPrice(cartProduct.getProduct().getPrice());
-            return cartProductResponse;
-        }).collect(Collectors.toList());
+        CartResponse cartResponse = new CartResponse();
+        if (cartOpt.isPresent()) {
+            Cart cart = cartOpt.get();
+            cartResponse.setId(cart.getId());
 
-        cartResponse.setCartProduct(cartProductResponses);
-        cartResponse.setTotal_price(cart.getTotal_price());
-    } else {
-        cartResponse.setId(0); // hoặc bỏ qua nếu không cần
-        cartResponse.setCartProduct(new ArrayList<>());
-        cartResponse.setTotal_price(0.0);
-    }
+            List<CartProductResponse> cartProductResponses = cart.getCart_products().stream().map(cartProduct -> {
+                CartProductResponse cartProductResponse = new CartProductResponse();
+                cartProductResponse.setId(cartProduct.getProduct().getId());
+                cartProductResponse.setProductName(cartProduct.getProduct().getName());
+                cartProductResponse.setQuantity(cartProduct.getQuantity());
+                cartProductResponse.setPrice(cartProduct.getProduct().getPrice());
+                return cartProductResponse;
+            }).collect(Collectors.toList());
 
-    return cartResponse;
+            cartResponse.setCartProduct(cartProductResponses);
+            cartResponse.setTotal_price(cart.getTotal_price());
+        } else {
+            cartResponse.setId(0); // hoặc bỏ qua nếu không cần
+            cartResponse.setCartProduct(new ArrayList<>());
+            cartResponse.setTotal_price(0.0);
+        }
+
+        return cartResponse;
     }
 
 }
