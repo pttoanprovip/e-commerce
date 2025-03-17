@@ -86,8 +86,15 @@ public class UserAddressServiceImpl implements UserAddressService {
     }
 
     @Override
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#userId) == authentication.principal.claims['sub']")
     public List<UserAddressResponse> getUserAddressByUserId(int userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken) {
+            Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();
+            System.out.println("JWT Sub: " + jwt.getClaim("sub"));
+            System.out.println("Requested User ID: " + userId);
+        }
+
         // Tìm các địa chỉ của người dùng
         List<UserAddress> addresses = userAddressRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Address not found"));
@@ -133,7 +140,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     }
 
     @Override
-    @PreAuthorize("hasRole('Admin') or T(String).valueOf(#userAddressRequest.userId) == authentication.principal.claims['sub']")
+    @PreAuthorize("hasRole('Admin') or T(String).valueOf(@userAddressRepository.findById(#id).orElseThrow().getUser().getId()) == authentication.principal.claims['sub']")
     public UserAddressResponse getUserAddressById(int id) {
         // Tìm địa chỉ theo ID
         UserAddress address = userAddressRepository.findById(id)
