@@ -34,16 +34,14 @@ public class StatisticServiceImpl implements StatisticService {
         LocalDateTime end = statisticRequest.getEndDate();
 
         int totalOrders = statisticRepository.countOrderByDay(start, end);
-        //int totalUsers = statisticRepository.countUserByDay(start, end);
-        double totalRevenue = statisticRepository.sumRevenueByDay(start, end);
-        int totalProductSold = statisticRepository.sumProductsSoldByDay(start, end);
+        Double totalRevenue = statisticRepository.sumRevenueByDay(start, end);
+        Integer totalProductSold = statisticRepository.sumProductsSoldByDay(start, end);
 
         statistic.setStartDate(start);
         statistic.setEndDate(end);
         statistic.setTotalOrder(totalOrders);
-        //statistic.setTotalUser(totalUsers);
-        statistic.setTotalRevenue(totalRevenue);
-        statistic.setTotalProductSold(totalProductSold);
+        statistic.setTotalRevenue(totalRevenue != null ? totalRevenue : 0.0);
+        statistic.setTotalProductSold(totalProductSold != null ? totalProductSold : 0);
 
         return modelMapper.map(statistic, StatisticResponse.class);
     }
@@ -63,14 +61,12 @@ public class StatisticServiceImpl implements StatisticService {
         statistic.setEndDate(end);
 
         int totalOrders = statisticRepository.countOrderByDay(start, end);
-        //int totalUsers = statisticRepository.countUserByDay(start, end);
-        double totalRevenue = statisticRepository.sumRevenueByDay(start, end);
-        int totalProductSold = statisticRepository.sumProductsSoldByDay(start, end);
+        Double totalRevenue = statisticRepository.sumRevenueByDay(start, end);
+        Integer totalProductSold = statisticRepository.sumProductsSoldByDay(start, end);
 
         statistic.setTotalOrder(totalOrders);
-        //statistic.setTotalUser(totalUsers);
-        statistic.setTotalRevenue(totalRevenue);
-        statistic.setTotalProductSold(totalProductSold);
+        statistic.setTotalRevenue(totalRevenue != null ? totalRevenue : 0.0);
+        statistic.setTotalProductSold(totalProductSold != null ? totalProductSold : 0);
 
         Statistic saveStatistic = statisticRepository.save(statistic);
 
@@ -82,8 +78,7 @@ public class StatisticServiceImpl implements StatisticService {
     public StatisticResponse getById(int id) {
         Statistic statistic = statisticRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Statistic not found"));
-            
+
         return modelMapper.map(statistic, StatisticResponse.class);
     }
-
 }

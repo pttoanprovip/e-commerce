@@ -16,12 +16,13 @@ public interface StatisticRepository extends JpaRepository<Statistic, Integer> {
     @Query("select count(0) from Order o where o.createAt between :startDate and :endDate")
     int countOrderByDay(LocalDateTime startDate, LocalDateTime endDate);
 
-    // @Query("select count(u) from User u where LOWER(u.role.roleName) = LOWER('USER') and u.createAt between :startDate and :endDate")
+    // @Query("select count(u) from User u where LOWER(u.role.roleName) =
+    // LOWER('USER') and u.createAt between :startDate and :endDate")
     // int countUserByDay(LocalDateTime startDate, LocalDateTime endDate);
 
-    @Query("select sum(o.total_price) from Order o where o.createAt between :startDate and :endDate")
-    double sumRevenueByDay(LocalDateTime startDate, LocalDateTime endDate);
+    @Query("SELECT COALESCE(SUM(o.total_price), 0) FROM Order o WHERE o.createAt BETWEEN :startDate AND :endDate")
+    Double sumRevenueByDay(LocalDateTime startDate, LocalDateTime endDate);
 
     @Query("select sum(oi.quantity) from OrderItem oi join oi.order o where o.createAt between :startDate and :endDate")
-    int sumProductsSoldByDay(LocalDateTime startDate, LocalDateTime endDate);
+    Integer sumProductsSoldByDay(LocalDateTime startDate, LocalDateTime endDate);
 }
