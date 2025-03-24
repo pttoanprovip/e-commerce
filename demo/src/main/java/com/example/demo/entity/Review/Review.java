@@ -2,8 +2,8 @@ package com.example.demo.entity.Review;
 
 import java.time.LocalDateTime;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import com.example.demo.entity.Product.Product;
 import com.example.demo.entity.User.User;
