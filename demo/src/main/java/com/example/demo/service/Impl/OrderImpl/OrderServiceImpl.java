@@ -32,29 +32,19 @@ import com.example.demo.repository.User.UserRepository;
 import com.example.demo.service.Dicount.DiscountService;
 import com.example.demo.service.Order.OrderService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private OrderRepository orderRepository;
-    private OrderItemRepository orderItemRepository;
-    private ProductRepository productRepository;
-    private UserRepository userRepository;
-    private CartRepository cartRepository;
-    private DiscountService discountService;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final CartRepository cartRepository;
+    private final DiscountService discountService;
     private final ModelMapper modelMapper;
-
-    // @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository,
-            ProductRepository productRepository, UserRepository userRepository, CartRepository cartRepository,
-            ModelMapper modelMapper, DiscountService discountService) {
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-        this.productRepository = productRepository;
-        this.userRepository = userRepository;
-        this.cartRepository = cartRepository;
-        this.modelMapper = modelMapper;
-        this.discountService = discountService;
-    }
 
     @Override
     @Transactional
@@ -220,6 +210,14 @@ public class OrderServiceImpl implements OrderService {
         updateOrder.setOrderStatus(orderStatus);
 
         orderRepository.save(updateOrder);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('Admin')")
+    public List<OrderResponse> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream().map(order -> modelMapper.map(order, OrderResponse.class))
+                .collect(Collectors.toList());
     }
 
 }

@@ -76,4 +76,16 @@ public class OrderController {
             return ResponseEntity.status(400).build();
         }
     }
+
+    @GetMapping
+    public ResponseEntity<?> getAllOrders() {
+        try {
+            List<OrderResponse> orders = orderService.getAllOrders();
+            return ResponseEntity.ok(orders);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
 }

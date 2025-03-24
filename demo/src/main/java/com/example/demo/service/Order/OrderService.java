@@ -14,4 +14,6 @@ public interface OrderService {
     List<OrderResponse> getUserById(int userId);
 
     void updateOrderStatus(int id, OrderStatus orderStatus);
+
+    List<OrderResponse> getAllOrders();
 }
