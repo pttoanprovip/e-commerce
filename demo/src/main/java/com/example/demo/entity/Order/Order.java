@@ -1,5 +1,6 @@
 package com.example.demo.entity.Order;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class Order {
     private Discount discount;
 
     @Column(name = "total_price")
-    private double total_price;
+    private BigDecimal total_price;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
@@ -52,4 +53,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems;
+
+    @Column(name = "ghtk_order_code")
+    private String ghtkOrderCode;
 }

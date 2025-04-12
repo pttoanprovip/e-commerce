@@ -6,6 +6,8 @@ import lombok.Data;
 public class UserAddressRequest {
     private int userId;
     private String address;
+    private String ward;
+    private String district;
     private String city;
     private String country;
     private String phone;

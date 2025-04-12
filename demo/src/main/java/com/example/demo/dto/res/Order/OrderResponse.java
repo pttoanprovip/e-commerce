@@ -15,4 +15,5 @@ public class OrderResponse {
     private double total_price;
     private OrderStatus  orderStatus;
     private LocalDateTime createAt;
+    private String ghtkOrderCode;
 }

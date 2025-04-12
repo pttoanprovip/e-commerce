@@ -28,6 +28,7 @@ public class UserAddressController {
         this.userAddressService = userAddressService;
     }
 
+    // Tạo mới một địa chỉ cho người dùng
     @PostMapping
     public ResponseEntity<?> create(@RequestBody UserAddressRequest userAddressRequest) {
         try {
@@ -40,6 +41,7 @@ public class UserAddressController {
         }
     }
 
+    // Xóa địa chỉ theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {
@@ -52,6 +54,7 @@ public class UserAddressController {
         }
     }
 
+    // Lấy danh sách địa chỉ của người dùng theo ID người dùng
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserAddressByUserId(@PathVariable int userId) {
         try {
@@ -64,6 +67,7 @@ public class UserAddressController {
         }
     }
 
+    // Cập nhật thông tin địa chỉ theo ID
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable int id,
@@ -78,6 +82,7 @@ public class UserAddressController {
         }
     }
 
+    // Lấy thông tin địa chỉ theo ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserAddressById(@PathVariable int id){
         try {

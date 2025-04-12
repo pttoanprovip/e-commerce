@@ -2,7 +2,6 @@ package com.example.demo.controller.Order;
 
 import java.util.List;
 
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,11 +23,11 @@ public class OrderController {
 
     private OrderService orderService;
 
-    //@Autowired
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
+    // Tạo mới một đơn hàng
     @PostMapping
     public ResponseEntity<?> placeOrder(@RequestBody OrderRequest orderRequest) {
         try {
@@ -41,6 +40,7 @@ public class OrderController {
         }
     }
 
+    // Lấy thông tin đơn hàng theo ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable int id) {
         try {
@@ -53,6 +53,7 @@ public class OrderController {
         }
     }
 
+    // Lấy danh sách đơn hàng theo ID người dùng
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getByUserId(@PathVariable int userId) {
         try {
@@ -65,10 +66,11 @@ public class OrderController {
         }
     }
 
+    // Cập nhật trạng thái đơn hàng
     @PutMapping("{userId}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable int userId, @RequestParam OrderStatus orderStatus) {
+    public ResponseEntity<?> updateStatus() {
         try {
-            orderService.updateOrderStatus(userId, orderStatus);
+            orderService.updateOrderStatus();
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -77,6 +79,7 @@ public class OrderController {
         }
     }
 
+    // Lấy danh sách tất cả đơn hàng
     @GetMapping
     public ResponseEntity<?> getAllOrders() {
         try {

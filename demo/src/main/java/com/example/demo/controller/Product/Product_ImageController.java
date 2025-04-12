@@ -1,7 +1,6 @@
 package com.example.demo.controller.Product;
 
 import org.springframework.http.MediaType;
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +20,11 @@ import com.example.demo.service.Product.ProductImageService;
 public class Product_ImageController {
     private ProductImageService productImageService;
 
-    // @Autowired
     public Product_ImageController(ProductImageService productImageService) {
         this.productImageService = productImageService;
     }
 
+    // Thêm mới hình ảnh cho sản phẩm
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> add(@RequestParam("file") MultipartFile file,
             @RequestParam("productId") int productId) {
@@ -46,6 +45,7 @@ public class Product_ImageController {
         }
     }
 
+    // Cập nhật hình ảnh của sản phẩm theo ID
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@RequestParam ProductImageRequest productImageRequest,
             @PathVariable int id,
@@ -60,6 +60,7 @@ public class Product_ImageController {
         }
     }
 
+    // Xóa hình ảnh của sản phẩm theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {

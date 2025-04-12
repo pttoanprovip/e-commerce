@@ -13,7 +13,7 @@ public interface OrderService {
 
     List<OrderResponse> getUserById(int userId);
 
-    void updateOrderStatus(int id, OrderStatus orderStatus);
+    void updateOrderStatus();
 
     List<OrderResponse> getAllOrders();
 }

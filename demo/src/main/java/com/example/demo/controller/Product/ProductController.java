@@ -3,7 +3,6 @@ package com.example.demo.controller.Product;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +26,11 @@ public class ProductController {
     private ProductService productService;
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-    // @Autowired
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
+    // Lấy danh sách tất cả sản phẩm
     @GetMapping
     public ResponseEntity<?> getAll() {
         try {
@@ -44,6 +43,7 @@ public class ProductController {
         }
     }
 
+    // Lấy thông tin sản phẩm theo ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable int id) {
         try {
@@ -56,6 +56,7 @@ public class ProductController {
         }
     }
 
+    // Thêm mới một sản phẩm
     @PostMapping
     public ResponseEntity<?> add(@RequestBody ProductRequest productRequest) {
         try {
@@ -68,6 +69,7 @@ public class ProductController {
         }
     }
 
+    // Cập nhật thông tin sản phẩm theo ID
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@RequestBody ProductRequest productRequest, @PathVariable int id) {
         try {
@@ -80,6 +82,7 @@ public class ProductController {
         }
     }
 
+    // Xóa sản phẩm theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {
@@ -92,6 +95,7 @@ public class ProductController {
         }
     }
 
+    // Tìm kiếm sản phẩm theo các tiêu chí
     @GetMapping("/search")
     public ResponseEntity<?> getProductByCriteria(
             @RequestParam(required = false) String name,
@@ -116,6 +120,22 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             logger.error("Error fetching products by criteria", e);
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    // So sánh các sản phẩm theo danh sách ID
+    @GetMapping("/compare")
+    public ResponseEntity<?> compareProducts(@RequestParam("ids") List<Integer> id) {
+        try {
+            List<ProductResponse> products = productService.compareProducts(id);
+            return ResponseEntity.ok(products);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Lỗi khi so sánh sản phẩm: ", e);
             return ResponseEntity.status(500).build();
         }
     }

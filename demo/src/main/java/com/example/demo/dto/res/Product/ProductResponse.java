@@ -15,6 +15,7 @@ public class ProductResponse {
     private String screen_size;
     private String brand;
     private double price;
+    private Integer weight;
 
     private CategoryResponse category;
     private List<ProductImageResponse> productImages;

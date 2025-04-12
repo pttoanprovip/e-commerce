@@ -8,21 +8,23 @@ import com.example.demo.dto.req.Payment.PaymentRequest;
 import com.example.demo.dto.res.Payment.PaymentResponse;
 import com.example.demo.service.Payment.PaymentService;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/payments/paypal")
 public class PayPalPaymentController {
 
     private PaymentService paymentService;
 
-    public PayPalPaymentController(PaymentService paymentService) {
+    public PayPalPaymentController(@Qualifier("payPalPaymentServiceImpl") PaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
+    // Tạo thanh toán PayPal
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody PaymentRequest paymentRequest) {
         try {
@@ -35,6 +37,7 @@ public class PayPalPaymentController {
         }
     }
 
+    // Thực thi thanh toán PayPal
     @GetMapping("/execute")
     public ResponseEntity<?> execute(
             @RequestParam("paymentId") String paymentId,

@@ -2,18 +2,9 @@ package com.example.demo.controller.User;
 
 import java.util.List;
 
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.dto.req.User.UserRequest;
 import com.example.demo.dto.res.User.UserResponse;
@@ -28,23 +19,25 @@ public class UserController {
 
     private UserService userService;
 
-    // @Autowired
+    // Constructor injection để tiêm UserService
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
+    // API tạo mới người dùng
     @PostMapping
     public ResponseEntity<?> add(@RequestBody UserRequest userRequest) {
         try {
             UserResponse user = userService.createUser(userRequest);
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage()); // lỗi nghiệp vụ
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Internal Server Error");
+            return ResponseEntity.status(500).body("Internal Server Error"); // lỗi hệ thống
         }
     }
 
+    // API lấy thông tin người dùng theo ID
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable int id) {
         try {
@@ -57,13 +50,17 @@ public class UserController {
         }
     }
 
+    // API lấy danh sách tất cả người dùng
     @GetMapping
     public ResponseEntity<?> getAll() {
         try {
+            // Lấy thông tin người dùng hiện tại từ context bảo mật
             var authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            log.info("Username: {}", authentication.getName());
-            authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
+            log.info("Username: {}", authentication.getName()); // log username hiện tại
+            authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority())); // log
+                                                                                                                    // các
+                                                                                                                    // quyền
 
             List<UserResponse> user = userService.getAll();
             return ResponseEntity.ok(user);
@@ -74,6 +71,7 @@ public class UserController {
         }
     }
 
+    // API cập nhật người dùng theo ID
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable int id,
@@ -88,11 +86,12 @@ public class UserController {
         }
     }
 
+    // API xóa người dùng theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {
             userService.delete(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build(); // trả về 204 nếu xóa thành công
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -100,6 +99,7 @@ public class UserController {
         }
     }
 
+    // API lấy thông tin người dùng đang đăng nhập
     @GetMapping("/myInfo")
     public ResponseEntity<?> getMyInfo() {
         try {

@@ -2,7 +2,6 @@ package com.example.demo.controller.Product;
 
 import java.util.List;
 
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +22,11 @@ import com.example.demo.service.Product.CategoryService;
 public class CategoryController {
     private CategoryService categoryService;
 
-    //@Autowired
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
 
+    // Lấy danh sách tất cả danh mục
     @GetMapping
     public ResponseEntity<?> getAll() {
         try {
@@ -40,6 +39,7 @@ public class CategoryController {
         }
     }
 
+    // Lấy thông tin danh mục theo ID
     @GetMapping("{id}")
     public ResponseEntity<?> getById(@PathVariable int id) {
         try {
@@ -52,6 +52,7 @@ public class CategoryController {
         }
     }
 
+    // Tìm kiếm danh mục theo tên
     @GetMapping("/search")
     public ResponseEntity<?> getByName(@RequestParam String name) {
         try {
@@ -64,6 +65,7 @@ public class CategoryController {
         }
     }
 
+    // Thêm mới một danh mục
     @PostMapping
     public ResponseEntity<?> add(@RequestBody CategoryRequest categoryRequest) {
         try {
@@ -76,6 +78,7 @@ public class CategoryController {
         }
     }
 
+    // Cập nhật thông tin danh mục theo ID
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@RequestBody CategoryRequest categoryRequest,
             @PathVariable int id) {
@@ -89,6 +92,7 @@ public class CategoryController {
         }
     }
 
+    // Xóa danh mục theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {

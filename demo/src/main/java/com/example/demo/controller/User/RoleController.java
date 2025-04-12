@@ -24,6 +24,7 @@ import lombok.AllArgsConstructor;
 public class RoleController {
     private final RoleService roleService;
 
+    // Tạo mới một vai trò
     @PostMapping
     public ResponseEntity<?> create(@RequestBody RoleRequest roleRequest) {
         try {
@@ -36,6 +37,7 @@ public class RoleController {
         }
     }
 
+    // Cập nhật thông tin vai trò theo ID
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable int id, @RequestBody RoleRequest roleRequest) {
         try {
@@ -48,6 +50,7 @@ public class RoleController {
         }
     }
 
+    // Xóa vai trò theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {
@@ -60,6 +63,7 @@ public class RoleController {
         }
     }
 
+    // Lấy danh sách tất cả vai trò
     @GetMapping
     public ResponseEntity<?> getAll() {
         try {

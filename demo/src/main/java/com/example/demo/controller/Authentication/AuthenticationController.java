@@ -26,6 +26,7 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
+    // Xác thực người dùng và tạo token
     @PostMapping("/token")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
         try {
@@ -38,6 +39,7 @@ public class AuthenticationController {
         }
     }
 
+    // Kiểm tra tính hợp lệ của token
     @PostMapping("/introspect")
     public ResponseEntity<?> authenticate(@RequestBody IntrospectRequest introspectRequest)
             throws JOSEException, ParseException {
@@ -51,6 +53,7 @@ public class AuthenticationController {
         }
     }
 
+    // Đăng xuất người dùng
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody LogoutRequest request)
             throws JOSEException, ParseException {
@@ -64,6 +67,7 @@ public class AuthenticationController {
         }
     }
 
+    // Xử lý đăng nhập thành công qua OAuth2
     @GetMapping("/oauth2/success")
     public ResponseEntity<?> oauth2Success(@AuthenticationPrincipal OAuth2User oAuth2User) {
         try {
@@ -76,6 +80,7 @@ public class AuthenticationController {
         }
     }
 
+    // Xử lý đăng nhập thất bại qua OAuth2
     @GetMapping("/oauth2/failure")
     public ResponseEntity<?> oauth2Failure() {
         return ResponseEntity.badRequest().body("OAuth2 login failed");

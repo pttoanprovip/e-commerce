@@ -22,6 +22,7 @@ public class StatisticController {
         this.statisticService = statisticService;
     }
 
+    // Lấy thống kê theo ngày
     @PostMapping("/by-date")
     public ResponseEntity<?> getStatisticByDay(@RequestBody StatisticRequest statisticRequest) {
         try {
@@ -34,6 +35,7 @@ public class StatisticController {
         }
     }
 
+    // Lấy thống kê theo ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getStatisticById(@PathVariable int id) {
         try {
@@ -46,6 +48,7 @@ public class StatisticController {
         }
     }
 
+    // Tạo báo cáo thống kê
     @PostMapping("/generate")
     public ResponseEntity<?> generateStatistics() {
         try {

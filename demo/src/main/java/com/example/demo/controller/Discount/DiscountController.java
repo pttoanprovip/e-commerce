@@ -2,7 +2,6 @@ package com.example.demo.controller.Discount;
 
 import java.util.List;
 
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,11 +24,11 @@ public class DiscountController {
 
     private DiscountService discountService;
 
-    //@Autowired
     public DiscountController(DiscountService discountService) {
         this.discountService = discountService;
     }
 
+    // Tạo mới một mã giảm giá
     @PostMapping
     public ResponseEntity<?> create(@RequestBody DiscountRequest discountRequest) {
         try {
@@ -42,6 +41,7 @@ public class DiscountController {
         }
     }
 
+    // Cập nhật thông tin mã giảm giá theo ID
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable int id,
@@ -56,6 +56,7 @@ public class DiscountController {
         }
     }
 
+    // Xóa mã giảm giá theo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
         try {
@@ -68,6 +69,7 @@ public class DiscountController {
         }
     }
 
+    // Lấy danh sách tất cả mã giảm giá
     @GetMapping
     public ResponseEntity<?> getAll() {
         try {
@@ -80,6 +82,7 @@ public class DiscountController {
         }
     }
 
+    // Lấy thông tin mã giảm giá theo ID
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable int id) {
         try {
@@ -92,6 +95,7 @@ public class DiscountController {
         }
     }
 
+    // Áp dụng mã giảm giá cho tổng giá
     @PostMapping("/apply_discount")
     public ResponseEntity<?> applyDiscount(
             @RequestBody ApplyDiscountRequest applyDiscountRequest,
@@ -105,5 +109,4 @@ public class DiscountController {
             return ResponseEntity.status(500).body("Internal Server Error");
         }
     }
-
 }

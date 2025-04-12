@@ -1,6 +1,5 @@
 package com.example.demo.controller.Cart;
 
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +17,11 @@ import com.example.demo.service.Cart.CartService;
 public class CartController {
     private final CartService cartService;
 
-    // @Autowired
     public CartController(CartService cartService) {
         this.cartService = cartService;
     }
 
+    // Thêm sản phẩm vào giỏ hàng
     @PostMapping("/add")
     public ResponseEntity<?> addItem(@RequestBody CartRequest cartRequest) {
         try {
@@ -35,6 +34,7 @@ public class CartController {
         }
     }
 
+    // Xóa sản phẩm khỏi giỏ hàng
     @PostMapping("/remove")
     public ResponseEntity<?> removeItem(@RequestBody CartRequest cartRequest) {
         try {
@@ -47,6 +47,7 @@ public class CartController {
         }
     }
 
+    // Lấy thông tin giỏ hàng theo ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getCart(@PathVariable int id) {
         try {
@@ -59,6 +60,7 @@ public class CartController {
         }
     }
 
+    // Lấy giỏ hàng theo ID người dùng
     @GetMapping("user/{userId}")
     public ResponseEntity<?> getUserIdCart(@PathVariable int userId) {
         try {
@@ -70,5 +72,4 @@ public class CartController {
             return ResponseEntity.status(500).body("Internal Server Error");
         }
     }
-
 }

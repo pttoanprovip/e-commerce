@@ -55,6 +55,9 @@ public class Product {
     @Column(name = "price")
     private double price;
 
+    @Column(name = "weight")
+    private Integer weight;
+
     @ManyToOne
     @JoinColumn(name = "id_category")
     @ToString.Exclude

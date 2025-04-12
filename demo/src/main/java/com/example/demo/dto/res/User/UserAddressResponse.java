@@ -6,6 +6,8 @@ import lombok.Data;
 public class UserAddressResponse {
     private int id;
     private String address;
+    private String ward;
+    private String district;
     private String city;
     private String country;
     private String phone;

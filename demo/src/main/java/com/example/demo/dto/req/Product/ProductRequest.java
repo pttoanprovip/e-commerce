@@ -15,6 +15,7 @@ public class ProductRequest {
     private String screen_size;
     private String brand;
     private double price;
+    private Integer weight;
 
     private Category Category;
 }

@@ -42,4 +42,6 @@ public interface ProductService {
 
     List<ProductResponse> findByPriceBetween(double minPrice, double maxPrice);
 
+    List<ProductResponse> compareProducts(List<Integer> id);
+
 }
