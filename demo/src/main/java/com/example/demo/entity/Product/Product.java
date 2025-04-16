@@ -53,7 +53,7 @@ public class Product {
     private String brand;
 
     @Column(name = "price")
-    private double price;
+    private Double price;
 
     @Column(name = "weight")
     private Integer weight;

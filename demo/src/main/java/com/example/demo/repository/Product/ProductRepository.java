@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.dto.res.Product.ProductResponse;
 import com.example.demo.entity.Product.Category;
 import com.example.demo.entity.Product.Product;
 
@@ -29,7 +28,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     List<Product> findByScreenSize(String screenSize);
 
-    List<Product> findByPrice(double price);
+    List<Product> findByPrice(Double price);
 
-    List<Product> findByPriceBetween(double minPrice, double maxPrice);
+    List<Product> findByPriceBetween(Double minPrice, Double maxPrice);
 }

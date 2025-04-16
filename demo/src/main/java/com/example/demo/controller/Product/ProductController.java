@@ -101,25 +101,41 @@ public class ProductController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String brand,
-            @RequestParam(required = false) double price,
+            @RequestParam(required = false) Double price,
             @RequestParam(required = false) String cpu,
             @RequestParam(required = false) String ram,
             @RequestParam(required = false) String storage,
             @RequestParam(required = false) String screenSize,
-            @RequestParam(required = false) double minPrice,
-            @RequestParam(required = false) double maxPrice) {
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice) {
+
         try {
-            logger.debug("name: {}, brand: {}, category: {}", name, brand, category);
-            List<ProductResponse> products = productService.findByCriteria(name, category, brand, screenSize, cpu, ram,
-                    storage, price, minPrice, maxPrice);
+            logger.debug(
+                    "Search criteria - name: {}, category: {}, brand: {}, price: {}, cpu: {}, ram: {}, storage: {}, screenSize: {}, minPrice: {}, maxPrice: {}",
+                    name, category, brand, price, cpu, ram, storage, screenSize, minPrice, maxPrice);
+
+            // Sửa lại cách xử lý tham số
+            List<ProductResponse> products = productService.findByCriteria(
+                    name,
+                    category,
+                    brand,
+                    screenSize,
+                    cpu,
+                    ram,
+                    storage,
+                    price != null ? price : 0.0,
+                    minPrice != null ? minPrice : 0.0,
+                    maxPrice != null ? maxPrice : 0.0);
+
             if (products.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(products);
         } catch (RuntimeException e) {
+            logger.error("Runtime error: ", e);
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            logger.error("Error fetching products by criteria", e);
+            logger.error("Unexpected error: ", e);
             return ResponseEntity.status(500).build();
         }
     }

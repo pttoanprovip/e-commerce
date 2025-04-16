@@ -12,9 +12,9 @@ public class ProductRequest {
     private String cpu;
     private String ram;
     private String storage;
-    private String screen_size;
+    private String screenSize;
     private String brand;
-    private double price;
+    private Double price;
     private Integer weight;
 
     private Category Category;
